@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Year in Games 2026 · preview</title>
+<link rel="icon" href="data:,">
+
+
+<script>{ const q = new URLSearchParams(location.search), rt = q.get("runtime") || "2.34.0", fin = q.get("finesse") === "1";
+  if (fin) document.write('<script src="finesse-clock.js"><\/script>');
+  document.write('<script src="https://cdn.jsdelivr.net/npm/@rive-app/canvas@' + rt + '/rive.js"><\/script>');
+  if (fin && q.get("local") === "1") document.write('<script src="finesse-pins.js"><\/script>'); }
+</script>
+<script type="importmap">
+{ "imports": { "@rive-app/canvas": "data:text/javascript,const r = window.rive; export const { Rive, EventType, Layout, Fit, Alignment, RuntimeLoader } = r; export default r;" } }
+</script>
+<link rel="stylesheet" href="yig-text-motion.css">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="yig-framing.css">
+<style>* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; background: #F1ECC0; color: #1F1F1F; }
+body { font: 500 14px/1.4 "NYT Franklin", "Helvetica Neue", Arial, sans-serif; }
+
+.yig-column { position: fixed; z-index: 1; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100vw, var(--yig-nav-column)); pointer-events: none; }
+.overlay { --u: 1px; position: absolute; inset: 0; color: var(--yig-copy-ink); }
+.nav-logo { position: absolute; top: var(--yig-logo-top); left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: var(--yig-logo-gap); }
+.nav-logo img { display: block; }
+.nav-progress { position: absolute; top: var(--yig-progress-top); left: 50%; transform: translateX(-50%); width: var(--yig-progress-w); height: var(--yig-progress-h);
+  border-radius: var(--yig-progress-radius); background: var(--yig-progress-track); overflow: hidden; }
+.nav-progress > span { display: block; height: 100%; width: 0; border-radius: var(--yig-progress-radius); background: var(--yig-progress-fill); transition: width .3s ease; }
+.blk { position: absolute; left: var(--yig-copy-side); right: var(--yig-copy-side); text-align: center; display: grid; justify-items: center; }
+.blk-icon { top: var(--yig-copy-top); }
+.blk-copy { top: var(--yig-copy-top); }
+
+.blk-copy.after-icon-slot { top: calc(var(--yig-copy-top) + 71px); }
+.t-serif { font: 500 24px / 1.2 "NYT Karnak", Georgia, serif; }
+.t-big { font: 700 25px / 1.3 "NYT Karnak", Georgia, serif; margin-top: 10px; }
+.t-small { font: 500 14px / 1.42 "NYT Franklin", Arial, sans-serif; margin-top: 8px; }
+.t-tag { font: 700 11px / 1.2 "NYT Franklin", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #5C6759; margin-bottom: 10px; }
+.t-icon img { width: 50px; height: auto; display: block; }
+.btn { display: inline-grid; place-items: center; margin-top: 18px; width: 196px; height: 48px; border-radius: 999px; background: #000; color: #FFF;
+  font: 600 16px / 1 "NYT Franklin", Arial, sans-serif; }
+
+.splash { position: absolute; inset: 0; opacity: 0; transition: opacity .45s ease; pointer-events: none; }
+body.on-splash .splash { opacity: 1; }
+body.on-splash .nav-logo, body.on-splash .nav-progress { opacity: 0; }
+.nav-logo, .nav-progress { transition: opacity .45s ease; }
+.splash-lockup { position: absolute; top: 197px; left: 50%; width: 294px; height: 166px; transform: translateX(-50%); }
+.splash-lockup > img { position: absolute; display: block; }
+.splash-tiles { position: absolute; top: 90px; left: 0; width: 294px; height: 76px; }
+
+.splash-tiles span { position: absolute; top: 0; height: 76px; display: block; background: #FFF; border: 1.5px solid #121212; box-sizing: border-box; padding-top: 20px;
+  text-align: center; font: 900 40px / 39.58px "NYT Franklin", "Arial Black", Arial, sans-serif; color: #121212; }
+.splash-tiles span:nth-child(1) { left: 0; width: 76px; }
+.splash-tiles span:nth-child(2) { left: 74px; width: 75.06px; }
+.splash-tiles span:nth-child(3) { left: 147.06px; width: 75.06px; }
+.splash-tiles span:nth-child(4) { left: 220.13px; width: 75.06px; }
+
+.splash-support { position: absolute; top: 471px; left: 50%; transform: translateX(-50%); width: 130px; height: 56px; display: grid; grid-template-rows: 16px 40px; justify-items: center; align-items: center;
+  font: 500 11px / 14px "NYT Franklin", Arial, sans-serif; color: #121212; }
+.splash-support > span { align-self: start; }
+.splash-support img { display: block; width: 118px; height: 24px; }
+.icons { display: flex; gap: 10px; margin-top: 14px; }
+.icons img { width: 44px; height: auto; display: block; }
+
+@media (min-width: 1025px) {
+  .splash, .blk-start, .blk-loader { transform: translateY(var(--sp-dy, 0px)) scale(var(--sp-k, 1)); }
+  .splash { transform-origin: 50% 0; }
+  .blk-start { transform-origin: 50% -403px; }
+  .blk-loader { transform-origin: 50% -413px; }
+}
+.blk-start { top: 403px; }
+.blk-start .btn { margin-top: 0; }
+.blk-loader { top: 413px; }
+.loader { display: block; width: 150px; height: 8px; border-radius: 4px; background: rgba(18, 18, 18, .28); overflow: hidden; }
+.loader > span { display: block; height: 100%; width: 12%; border-radius: 4px; background: #121212; transition: width .6s ease; }
+
+.panel { display: grid; place-items: center; text-align: center; width: calc(300 * var(--u)); height: calc(250 * var(--u)); margin-top: calc(6 * var(--u));
+  border: calc(2 * var(--u)) dashed #1F1F1F; border-radius: calc(10 * var(--u)); background: rgba(255, 255, 255, .78);
+  font: 700 calc(16 * var(--u)) / 1.3 "NYT Franklin", Arial, sans-serif; padding: calc(16 * var(--u)); }
+.panel-video { height: calc(420 * var(--u)); width: calc(240 * var(--u)); background: rgba(31, 31, 31, .82); color: #FFF; border-color: #FFF; }
+
+.blk-bubble { left: var(--bub-left, 47px); right: auto; top: var(--bub-top, 140px); width: 280px; justify-items: stretch; text-align: left;
+  transform: scale(var(--bub-k, 1)); transform-origin: var(--bub-tail-x, 100px) calc(100% + 20px); }
+.bubble { position: relative; box-sizing: border-box; width: 280px; padding: 24px; background: #FFF; border: 2px solid #1F1F1F; border-radius: 14px;
+  font: 500 16px / 1.38 "NYT Franklin", Arial, sans-serif; color: #121212; }
+.bubble b { font-weight: 700; }
+.bubble svg { position: absolute; top: 100%; left: calc(var(--bub-tail-x, 100px) - 2px - 22px); display: block; overflow: visible; }
+
+.yig-tap { position: fixed; top: 0; bottom: 0; z-index: 2; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+.yig-tap[data-zone="back"] { left: 0; width: var(--yig-tap-back-share); }
+.yig-tap[data-zone="next"] { right: 0; width: calc(100% - var(--yig-tap-back-share)); }
+
+.yig-arrow { position: fixed; top: 50%; z-index: 3; width: 56px; height: 56px; margin: 0; padding: 0; border: 0; border-radius: 50%;
+  background: none; cursor: pointer; transform: translateY(-50%); }
+.yig-arrow img { width: 56px; height: 56px; display: block; }
+.yig-arrow[data-dir="back"] { left: 20px; }
+.yig-arrow[data-dir="next"] { right: 20px; }
+.yig-arrow[data-dir="next"] img { transform: scaleX(-1); }
+.yig-arrow:focus-visible { outline: 2px solid #1F1F1F; outline-offset: 3px; }
+
+.video-bg { position: fixed; inset: 0; z-index: 0; opacity: 0; pointer-events: none; transition: opacity .6s ease; }
+
+body.html-off .yig-column, body.html-off .yig-arrow, body.html-off .video-bg { visibility: hidden; }
+@media (min-width: 1025px) { body.html-off .yig-tap { display: block; } }
+.rive-only-pill { position: fixed; right: 10px; bottom: 10px; z-index: 10; margin: 0; padding: 4px 10px; border: 0; border-radius: 999px; cursor: pointer;
+  background: rgba(18, 18, 18, .55); color: #FFF; font: 600 11px / 1.4 "NYT Franklin", Arial, sans-serif; opacity: .7; }
+.rive-only-pill:hover, .rive-only-pill:focus-visible { opacity: 1; }
+.rive-only-pill[aria-pressed="true"] { background: #121212; opacity: 1; }
+.curtain { position: fixed; inset: 0; z-index: 9; background: #F1ECC0; display: grid; place-items: center; font: 600 14px "NYT Franklin", Arial, sans-serif; }
+.rive-only-pill { display: none !important; }
+</style>
+</head>
+<body class="on-splash">
+<div class="yig-background"><div class="yig-artboard" id="artboard"></div></div>
+<div class="video-bg" id="video-bg"></div>
+<main class="yig-column"><div class="overlay" id="overlay" aria-live="polite">
+  <div class="nav-logo" aria-label="The New York Times Year in Games" role="img">
+    <img src="assets/yig-nyt-small.svg" width="110.136" height="15.1138" alt="">
+    <img src="assets/yig-year-in-games.svg" width="170.215" height="18.5492" alt="">
+  </div>
+  <div class="nav-progress" aria-hidden="true"><span id="progress"></span></div>
+  <div class="splash" aria-hidden="true">
+    <div class="splash-lockup">
+      <img src="assets/yig-start-nyt.svg" width="188.405" height="24.7193" style="left: 52.8px; top: 0.64px" alt="">
+      <img src="assets/yig-start-year-in-games.svg" width="293.646" height="32" style="left: 0.18px; top: 38px" alt="">
+      <div class="splash-tiles"><span>2</span><span>0</span><span>2</span><span>6</span></div>
+    </div>
+    <div class="splash-support"><span>Supported by</span><img src="assets/t-mobile.svg" alt="T-Mobile"></div>
+  </div>
+</div></main>
+<button class="yig-tap" data-zone="back" id="tap-back" aria-label="Back"></button>
+<button class="yig-tap" data-zone="next" id="tap-next" aria-label="Next"></button>
+<button class="yig-arrow" data-dir="back" id="arrow-back" aria-label="Back"><img src="icons/ui-desktop-button.svg" alt=""></button>
+<button class="yig-arrow" data-dir="next" id="arrow-next" aria-label="Next"><img src="icons/ui-desktop-button.svg" alt=""></button>
+<button class="rive-only-pill" id="rive-only-pill" aria-pressed="false" title="Hide all the HTML and show only the animation (H)">Rive only</button>
+<div class="curtain" id="curtain" hidden>Skipping ahead…</div>
+
+<script type="module">import { start, onTap, onBack, ready, resize, state, setCopySignal, setReducedMotion, onCopyLog, signalFiles, GAME_ORDER, COMMUNITY_GAMES } from "./yig-integration.js";
+
+const q = new URLSearchParams(location.search);
+let FLOW = q.get("flow") === "anon" ? "anon" : "sub";
+
+const PLAYERS = {
+  "wordle-only": { completed: { wordle: 212, connections: 7, mini: 3 }, events: 5, achievements: 9 },
+  "midi-only": { completed: { midi: 40, crossword: 4 }, events: 3, achievements: 0 },
+  "connections-only": { completed: { wordle: 4, connections: 120, strands: 2 }, events: 0, achievements: 3 },
+  "all-seven": { completed: { wordle: 212, connections: 140, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, events: 0, achievements: 0 },
+  "all-seven-short": { completed: { wordle: 212, connections: 140, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, events: 5, achievements: 9, firstCardOnly: true },
+  "several-games": { completed: { wordle: 212, connections: 7, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, events: 0, achievements: 14 },
+  "none": { completed: { wordle: 3, connections: 2 }, events: 0, achievements: 0 },
+};
+const WALL = { wordle: "#C3E2C0", connections: "#E1DBF5", strands: "#DFF3F0", "spelling-bee": "#FFFDEF", mini: "#C0D8F8", midi: "#7EAAF1", crossword: "#6493E6" };
+const PLAYER = PLAYERS[q.get("player")] ?? PLAYERS["wordle-only"];
+const CARDS_PER_GAME = PLAYER.firstCardOnly
+  ? { wordle: 1, connections: 1, "spelling-bee": 1, strands: 1, mini: 1, midi: 1, crossword: 1 }
+  : { wordle: 4, connections: 5, "spelling-bee": 2, strands: 1, mini: 1, midi: 1, crossword: 1 };
+const NAME = { wordle: "Wordle", connections: "Connections", strands: "Strands", "spelling-bee": "Spelling Bee", mini: "The Mini", midi: "The Midi", crossword: "The Crossword" };
+const ICON = { wordle: "wordle", connections: "connections", strands: "strands", "spelling-bee": "spelling-bee", mini: "mini", midi: "midi", crossword: "crossword" };
+const QUALIFIES = 10;
+const COMMUNITY_ORDER = GAME_ORDER.filter((g) => COMMUNITY_GAMES.includes(g));
+const ANON_COMMUNITY = COMMUNITY_ORDER.filter((g) => g !== "wordle");
+const own = GAME_ORDER.filter((g) => (PLAYER.completed[g] ?? 0) >= QUALIFIES);
+if (FLOW === "sub" && own.length === 0) FLOW = "anon";
+const TOP = FLOW === "anon" ? "wordle" : (q.get("top") || own[0] || "wordle");
+
+const c = (file, scene, chapter, copy, extra = {}) => ({ file, scene, chapter, copy, ...extra });
+function buildCards() {
+  const anon = FLOW === "anon";
+  const out = [
+    c(1, "loading", "Loading", [["loader", ""]], { slot: "loader" }),
+    c(1, "start", "Start", [["btn", "Let’s go"]], { slot: "start" }),
+    c(1, "ad", "Ad 1", [], { ad: true }),
+  ];
+  const ch1 = anon
+    ? [[["t-serif", "In 2026, you brought your best game."]],
+       [["t-serif", "Together, you all completed X million puzzles."], ["t-small", "That’s some serious puzzle power."]],
+       [["t-serif", "The most popular Wordle starting word was ADIEU."], ["t-small", "Oh là là!"]],
+       [["t-serif", "And the word that stumped the most players was PSHAW."], ["t-small", "(n) An expression of disapproval or disbelief."]],
+       [["bubble", "Did you know: Over XXX players achieved 100-day Wordle streaks this year. That’s a lot, even for this clever bot!"]]]
+    : [[["t-serif", "This year, you turned downtime into playtime."]],
+       [["t-serif", "You played a total of X puzzles."], ["t-small", "Cheers, super solver."]],
+       [["t-serif", "Your first puzzle was [game icon + name], [date, time]."]],
+       [["t-serif", "And your longest streak was in [game] at X days."], ["t-small", "Keep the wins coming."]],
+       [["bubble", "Did you know: Over XXX players achieved 100-day Wordle streaks this year. That’s a lot, even for this clever bot!"]]];
+  const CH1_SCENES = ["chapter-1", "chapter-1-2", "chapter-1-3", "chapter-1-4", "chapter-1-5"];
+  ch1.forEach((copy, i) => out.push(c(1, CH1_SCENES[i], i ? "" : "Chapter 1", copy, i === 4 ? { slot: "bubble" } : {})));
+  out.push(c(1, "ad", "Ad 2", [], { ad: true }));
+  out.push(c(2, "chapter-2", "Chapter 2", [["t-serif", "But that’s not all"], ["t-small", "SAMPLE · the Chapter 2 opener"]]));
+  const community = (g, why) => c(2, g, "", [["t-tag", why], ["t-serif", `In ${NAME[g]}, all players…`], ["t-big", "Community stat"]], { community: true, icon: g });
+  if (anon) {
+    ANON_COMMUNITY.forEach((g) => out.push(community(g, "Community card · no lockup")));
+    out.push(c(2, "to-chapter-3", "Ad 3", [], { ad: true }));
+  } else {
+    for (const g of own) {
+      for (let i = 1; i <= CARDS_PER_GAME[g]; i++) {
+        out.push(c(2, g, "", [["t-tag", `${NAME[g]} · card ${i} of ${CARDS_PER_GAME[g]}`], ["t-serif", "Your stat"], ["t-big", "Sample"]], { icon: g }));
+      }
+    }
+    if (own.length === 1) {
+      out.push(c(2, "chapter-2-community-intro", "Chapter 2.5", [["t-serif", "The rest of the world"], ["t-serif", "also came to play."]]));
+      COMMUNITY_ORDER.filter((g) => g !== own[0]).forEach((g) => out.push(community(g, "Chapter 2.5 · community card")));
+    }
+  }
+  if (anon) {
+    out.push(c(3, "chapter-3", "Chapter 3", [["t-serif", "There’s plenty more to celebrate, too."]]));
+    out.push(c(3, "chapter-3-2", "", [["t-serif", "Crossplay, the Midi and bonus puzzles introduced new ways to play."], ["btn", "Download Crossplay app"], ["icons", "connections,crossword,midi"]]));
+    out.push(c(3, "chapter-3-event-badges", "", [["t-serif", "Connections hit 1000 puzzles."], ["panel", "1000TH BADGE · HTML · SAMPLE"]]));
+    out.push(c(3, "chapter-3-event-badges", "", [["t-serif", "And Wordle turned 5 and fabulous."], ["panel", "WORDLE 5 ICON · HTML · SAMPLE"]]));
+  } else {
+    out.push(c(3, "chapter-3", "Chapter 3", [["t-serif", "There’s plenty more to celebrate, too."]]));
+    out.push(c(3, "chapter-3-2", "", [["t-serif", "Crossplay, the Midi and bonus puzzles gave you new ways to play."]]));
+    if (PLAYER.achievements > 0) out.push(c(3, "chapter-3-personal-badges", "", [["t-serif", "You also earned new badges"], ["panel", `${PLAYER.achievements} PERSONAL BADGES · HTML · SAMPLE`]]));
+    if (PLAYER.events > 0) out.push(c(3, "chapter-3-event-badges", "", [["t-serif", "And bragging rights."], ["panel", `${PLAYER.events} EVENT BADGES · HTML · SAMPLE`]]));
+  }
+  out.push(c(3, "chapter-4", "Chapter 4", [["t-serif", anon ? "But through it all, it’s clear everyone plays favorites." : "But through it all, it’s clear you play favorites."]], { topGame: TOP, reveal: false }));
+  out.push(c(3, "chapter-4-top-game", "", [["t-serif", anon ? "In 2026, everyone’s top game was…" : "In 2026, your top game was…"], ["t-big", NAME[TOP]]], { icon: TOP, reveal: true }));
+  out.push(c(3, "chapter-4-editor-video", "Video", [["panel panel-video", anon ? "VIDEO FROM ALL THE EDITORS · SAMPLE" : `${NAME[TOP].toUpperCase()} VIDEO · SAMPLE`], ["t-serif", "Tracey Bennett"], ["t-small", `Editor of ${NAME[TOP]} · SAMPLE`]], { kind: "video", reveal: true, bg: WALL[TOP] }));
+  out.push(c(3, "end", "End", anon
+    ? [["t-serif", "Thanks for playing"], ["t-small", "Register for a personalized Year in Games next year. SAMPLE"]]
+    : [["t-serif", "Thanks for playing"], ["t-small", "SAMPLE"]]));
+  if (!anon) out.push(c(3, "share", "Share", [["panel", "SHARE CARD (HTML) · SAMPLE"]]));
+  return out;
+}
+const cards = buildCards();
+
+const esc = (v) => String(v).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
+function lineHtml([cls, text]) {
+  if (cls.startsWith("panel")) return `<span class="yig-pop ${esc(cls)}">${esc(text)}</span>`;
+  if (cls === "bubble") {
+    const [lead, ...rest] = text.split(":");
+    return `<span class="yig-pop bubble"><b>${esc(lead)}:</b>${esc(rest.join(":"))}<svg width="26" height="22" viewBox="0 0 26 22" aria-hidden="true">`
+      + `<path d="M0 0 L22 22 L18 0" fill="#FFF" stroke="#1F1F1F" stroke-width="2" stroke-linejoin="round"/><path d="M1.5 1 H17" stroke="#FFF" stroke-width="2.6"/></svg></span>`;
+  }
+  if (cls === "btn") return `<span class="yig-pop btn">${esc(text)}</span>`;
+  if (cls === "icons") return `<span class="yig-pop icons">${text.split(",").map((g) => `<img src="icons/${ICON[g]}-icon.svg" alt="">`).join("")}</span>`;
+  if (cls === "loader") return `<span class="yig-pop loader"><span id="loader-fill"></span></span>`;
+  return `<span class="yig-mask"><span class="yig-line ${esc(cls)}">${esc(text)}</span></span>`;
+}
+let html = "";
+for (const g of new Set(cards.map((k) => k.icon).filter(Boolean))) {
+  html += `<div class="yig-icon blk blk-icon" data-icon-game="${esc(g)}" hidden><span class="yig-pop t-icon"><img src="icons/${ICON[g]}-icon.svg" alt=""></span></div>`;
+}
+cards.forEach((k, i) => {
+  html += `<div class="yig-text blk blk-copy${k.icon ? " after-icon-slot" : ""}${k.slot ? ` blk-${k.slot}` : ""}" data-copy-frame="${i}" hidden>${k.copy.map(lineHtml).join("")}</div>`;
+});
+document.getElementById("overlay").insertAdjacentHTML("beforeend", html);
+
+const copyLog = [];
+setCopySignal(q.get("copy") !== "timer");
+if (q.has("reducedMotion")) setReducedMotion(q.get("reducedMotion") === "1");
+onCopyLog((ev) => {
+  copyLog.push(ev);
+  if (parent !== window) parent.postMessage({ type: "yig-copy-log", ev }, "*");
+});
+start(document.getElementById("artboard"), cards);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+function cardFor(goto) {
+  const [file, scene, ...flags] = goto.split(":");
+  const hits = cards.map((k, i) => i).filter((i) => cards[i].file === Number(file) && cards[i].scene === scene && !!cards[i].community === flags.includes("community"));
+  return hits[flags.includes("2") ? 1 : 0] ?? 0;
+}
+const jump = q.get("goto") ? cardFor(q.get("goto")) : Number(q.get("jump") || 0);
+const fill = () => document.getElementById("loader-fill");
+let creep = 12;
+const creeper = setInterval(() => { creep = Math.min(85, creep + 6); if (fill()) fill().style.width = `${creep}%`; }, 500);
+ready(1).then(async () => {
+  clearInterval(creeper);
+  if (fill()) fill().style.width = "100%";
+  if (jump > 1) {
+    document.getElementById("curtain").hidden = false;
+    for (let i = 0; i < jump - 1; i++) { onTap(); await sleep(90); }
+    await sleep(3800);
+    document.getElementById("curtain").hidden = true;
+    onTap();
+  } else if (jump === 1) {
+    await sleep(1300);
+    onTap();
+  }
+});
+
+for (const id of ["tap-next", "arrow-next"]) document.getElementById(id).addEventListener("click", () => onTap());
+for (const id of ["tap-back", "arrow-back"]) document.getElementById(id).addEventListener("click", () => onBack());
+addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") { e.preventDefault(); onTap(); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); onBack(); }
+});
+addEventListener("resize", () => resize());
+
+let riveOnly = q.has("rive-only"), htmlOff = null;
+const pill = document.getElementById("rive-only-pill");
+function showHtml() {
+  const off = riveOnly || !!cards[state().frame]?.ad;
+  if (off !== htmlOff) { htmlOff = off; document.body.classList.toggle("html-off", off); }
+  pill.setAttribute("aria-pressed", String(riveOnly));
+}
+(function watch() { showHtml(); requestAnimationFrame(watch); })();
+function setRiveOnly(on) {
+  riveOnly = !!on;
+  const p = new URLSearchParams(location.search); p.delete("rive-only");
+  const rest = p.toString();
+  history.replaceState(null, "", `${location.pathname}${riveOnly ? (rest ? `?${rest}&rive-only` : "?rive-only") : (rest ? `?${rest}` : "")}${location.hash}`);
+  showHtml();
+}
+pill.addEventListener("click", () => { setRiveOnly(!riveOnly); pill.blur(); });
+addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.("select, input, textarea")) return;
+  if (e.key === "h" || e.key === "H") setRiveOnly(!riveOnly);
+});
+
+const SPLASH_TOP = 16, SPLASH_H = 330, SPLASH_LOCKUP_Y = 197, HOP_TOP_Y = 525, HOP_GAP = 28;
+function layoutSplash() {
+  const root = document.documentElement.style;
+  if (innerWidth < 1025) { root.removeProperty("--sp-dy"); root.removeProperty("--sp-k"); return; }
+  const r = document.getElementById("artboard").getBoundingClientRect();
+  const hopTop = r.top + (HOP_TOP_Y / 1067) * r.height;
+  const k = Math.max(0.5, Math.min(1, (hopTop - HOP_GAP - SPLASH_TOP) / SPLASH_H));
+  root.setProperty("--sp-k", k.toFixed(4));
+  root.setProperty("--sp-dy", `${(SPLASH_TOP - SPLASH_LOCKUP_Y * k).toFixed(2)}px`);
+}
+addEventListener("resize", layoutSplash);
+addEventListener("load", layoutSplash);
+layoutSplash();
+setTimeout(layoutSplash, 300);
+
+const BOT_HEAD_X = 755.7, BOT_HEAD_Y = 376.5, BUB_LEFT = 140.4, BUB_ABOVE = 174, BUB_TAIL_X = 78, BUB_TAIL = 20, BUB_TOP_MIN = 142;
+function layoutBubble() {
+  const blk = document.querySelector(".blk-bubble");
+  if (!blk || blk.hidden) return;
+  const r = document.getElementById("artboard").getBoundingClientRect();
+  const col = blk.offsetParent.getBoundingClientRect();
+  const hx = r.left + (BOT_HEAD_X / 1495) * r.width - col.left, hy = r.top + (BOT_HEAD_Y / 1067) * r.height - col.top;
+  const w = blk.offsetWidth, h = blk.offsetHeight;
+  const left = Math.max(8, Math.min(col.width - w - 8, hx - BUB_LEFT));
+  const tail = Math.max(30, Math.min(w - 30, hx - BUB_LEFT + BUB_TAIL_X - left));
+  const top = hy - BUB_ABOVE, tip = top + h + BUB_TAIL;
+  const k = top < BUB_TOP_MIN ? Math.max(0.6, (tip - BUB_TOP_MIN) / (h + BUB_TAIL)) : 1;
+  const s = blk.style;
+  s.setProperty("--bub-left", `${left.toFixed(1)}px`);
+  s.setProperty("--bub-top", `${top.toFixed(1)}px`);
+  s.setProperty("--bub-tail-x", `${tail.toFixed(1)}px`);
+  s.setProperty("--bub-k", k.toFixed(4));
+}
+addEventListener("resize", layoutBubble);
+
+const progress = document.getElementById("progress");
+const videoBg = document.getElementById("video-bg");
+setInterval(() => {
+  document.body.classList.toggle("on-splash", state().frame <= 1);
+  progress.style.width = `${(100 * state().frame) / (cards.length - 1)}%`;
+  const k = cards[state().frame];
+  if (k.bg) videoBg.style.background = k.bg;
+  videoBg.style.opacity = k.kind === "video" ? 1 : 0;
+  layoutBubble();
+}, 100);
+
+window.yigExperience = { cards, onTap, onBack, state, setCopySignal, signalFiles, copyLog, flow: FLOW, top: TOP, setRiveOnly, riveOnly: () => riveOnly };
+</script>
+</body>
+</html>

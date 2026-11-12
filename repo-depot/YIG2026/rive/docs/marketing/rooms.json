@@ -1,0 +1,165 @@
+{
+ "1:loading": {
+  "room": null,
+  "kind": "loading",
+  "loop": 0.8166666666666667
+ },
+ "1:start": {
+  "room": "Start",
+  "kind": "start",
+  "intro": 3.2,
+  "loop": 5.0,
+  "small": 5.0,
+  "smallStart": 1.65
+ },
+ "1:ad": {
+  "room": null,
+  "kind": "picture"
+ },
+ "1:chapter-1": {
+  "room": "Chapter 1 Card 1",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 12.7,
+  "small": 12.7,
+  "smallStart": 1.65
+ },
+ "1:chapter-1-2": {
+  "room": "Chapter 1 Card 2",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 8.316666666666666
+ },
+ "1:chapter-1-3": {
+  "room": "Chapter 1 Card 3",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 3.65
+ },
+ "1:chapter-1-4": {
+  "room": "Chapter 1 Card 4",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 10.2
+ },
+ "1:chapter-1-5": {
+  "room": "Chapter 1 Card 5",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 9.3
+ },
+ "2:chapter-2": {
+  "room": "Shelf",
+  "kind": "opener",
+  "intro": 3.2,
+  "loop": 6.5
+ },
+ "2:wordle": {
+  "room": "Wordle",
+  "kind": "game",
+  "intro": 3.2,
+  "loop": 7.2
+ },
+ "2:connections": {
+  "room": "Connections",
+  "kind": "game",
+  "intro": 3.2,
+  "loop": 8.933333333333334
+ },
+ "2:strands": {
+  "room": "Strands",
+  "kind": "game",
+  "intro": 3.2,
+  "loop": 10.533333333333333
+ },
+ "2:spelling-bee": {
+  "room": "Spelling Bee",
+  "kind": "game",
+  "intro": 3.2,
+  "loop": 12.083333333333334
+ },
+ "2:mini": {
+  "room": "The Mini",
+  "kind": "game",
+  "intro": 3.2,
+  "loop": 18.683333333333334
+ },
+ "2:midi": {
+  "room": "The Midi",
+  "kind": "game",
+  "intro": 3.2,
+  "loop": 12.75
+ },
+ "2:crossword": {
+  "room": "The Crossword",
+  "kind": "game",
+  "intro": 3.2,
+  "loop": 12.516666666666667
+ },
+ "2:to-chapter-3": {
+  "room": null,
+  "kind": "picture"
+ },
+ "2:from-chapter-1": {
+  "room": null,
+  "kind": "picture"
+ },
+ "2:chapter-2-community-intro": {
+  "room": "Community",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 8.016666666666667,
+  "small": 8.016666666666667,
+  "smallStart": 1.65
+ },
+ "3:ad": {
+  "room": null,
+  "kind": "picture"
+ },
+ "3:chapter-3": {
+  "room": "Chapter 3",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 11.716666666666667,
+  "small": 11.716666666666667,
+  "smallStart": 1.65
+ },
+ "3:chapter-3-2": {
+  "room": null,
+  "kind": "shared-room"
+ },
+ "3:chapter-3-personal-badges": {
+  "room": null,
+  "kind": "shared-picture"
+ },
+ "3:chapter-3-event-badges": {
+  "room": null,
+  "kind": "shared-picture"
+ },
+ "3:chapter-4": {
+  "room": "Chapter 4",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 7.0
+ },
+ "3:chapter-4-top-game": {
+  "room": null,
+  "kind": "shared-room"
+ },
+ "3:chapter-4-editor-video": {
+  "room": null,
+  "kind": "shared-room"
+ },
+ "3:end": {
+  "room": "End",
+  "kind": "room",
+  "intro": 3.2,
+  "loop": 5.0,
+  "small": 5.0,
+  "smallStart": 1.65
+ },
+ "3:share": {
+  "room": null,
+  "kind": "shared-room"
+ }
+}

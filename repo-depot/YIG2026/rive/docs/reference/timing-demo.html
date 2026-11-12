@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Year in Games 2026: copy timing and navigation</title>
+<link rel="icon" href="data:,">
+<!-- The real text CSS. Its two first-visit times are read from here, not copied. Keep this page beside yig-text-motion.css. -->
+<link rel="stylesheet" href="yig-text-motion.css">
+<style>
+  :root { --ink: #121212; --mute: #6b6b66; --line: #dcd9cf; --paper: #faf8f1; --f1: #e0742a; --f2: #d0568c; --f3: #6c58c4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.45 -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  [hidden] { display: none !important; }
+  header.top, section, main { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+  header.top { padding-top: 28px; }
+  h1 { font: 600 28px/1.15 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
+  h2 { font: 600 12px/1 -apple-system, Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin: 0 0 10px; }
+  .lede { margin: 0; color: #3a3a36; max-width: 70ch; }
+  .lede code, p code { font-size: 13px; background: #efece1; padding: 1px 5px; border-radius: 3px; }
+  .cssnote { margin-top: 8px; padding: 8px 12px; background: #fbe3dc; border-radius: 6px; font-size: 13px; }
+
+  /* the cards strip */
+  .stripbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 22px 0 10px; }
+  .seg { display: inline-flex; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .seg button { border: 0; background: transparent; padding: 6px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .link { border: 0; background: none; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; color: var(--mute); }
+  .hint { color: var(--mute); font-size: 13px; }
+  .strip { display: grid; grid-template-columns: repeat(3, minmax(0, auto)); gap: 10px; align-items: start; justify-content: start; }
+  .file { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px 10px; background: #fff; }
+  .file h3 { margin: 0 0 6px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .file h3 i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .file h3 small { font-weight: 400; color: var(--mute); }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; max-width: 460px; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 5px; padding: 3px 7px; font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap; }
+  .chip b { font-weight: 600; color: var(--mute); margin-right: 4px; font-size: 11px; }
+  .chip.ad { border-style: dashed; }
+  .chip.seen { background: #efece1; }
+  .chip.now { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .chip.now b { color: #bbb; }
+  .chip:hover { border-color: var(--ink); }
+
+  /* demo layout */
+  main { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 32px; margin-top: 26px; }
+  .phone { width: 320px; height: 692px; border: 8px solid var(--ink); border-radius: 36px; position: relative; overflow: hidden; background: #ccc; }
+  .backdrop { position: absolute; inset: 0; --wall: #F1ECC0; --floor: #FF811E; background: linear-gradient(var(--wall) 0 70%, var(--floor) 70% 100%);
+    transition: --wall 1450ms cubic-bezier(.45,0,.55,1), --floor 1450ms cubic-bezier(.45,0,.55,1); }
+  @property --wall { syntax: "<color>"; inherits: true; initial-value: #F1ECC0; }
+  @property --floor { syntax: "<color>"; inherits: true; initial-value: #FF811E; }
+  .rooms { position: absolute; inset: 0; }
+  .room { position: absolute; inset: 0; will-change: transform; }
+  .room .ball { position: absolute; left: 50%; top: 66%; width: 34px; height: 34px; margin-left: -17px; border-radius: 50%; background: #d8261d; }
+  .room .prop { position: absolute; left: 50%; top: 52%; width: 120px; height: 14px; margin-left: -60px; background: rgba(0,0,0,.18); border-radius: 3px; }
+  .room.picture .ball, .room.picture .prop { display: none; }
+  .room .tag { position: absolute; left: 14px; bottom: 14px; font-size: 11px; color: rgba(0,0,0,.6); }
+  .room .tag em { font-style: normal; display: block; color: rgba(0,0,0,.45); }
+  .lockup { position: absolute; left: 50%; top: 330px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 14px; white-space: nowrap; }
+  .copy { position: absolute; top: 56px; left: 22px; right: 22px; font-size: 24px; line-height: 1.15; font-family: Georgia, serif; }
+  .copy .yig-line.sub { font: 14px/1.3 -apple-system, Arial, sans-serif; margin-top: 6px; color: rgba(0,0,0,.65); }
+  .yig-icon { margin-bottom: 10px; }
+  .yig-icon .yig-pop { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font: 600 14px/1 Arial, sans-serif; }
+  .controls { display: flex; gap: 10px; margin: 14px 0 0 8px; width: 320px; }
+  .controls button { flex: 1; padding: 11px 0; border-radius: 999px; border: 1px solid var(--ink); background: #fff; font: inherit; cursor: pointer; }
+  .controls button.next { background: var(--ink); color: #fff; }
+  .controls button:active { transform: translateY(1px); }
+
+  /* readout */
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-bottom: 18px; }
+  .tapline { font: 600 18px/1.2 Georgia, serif; margin: 0 0 12px; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; }
+  ol.calls { list-style: none; margin: 0; padding: 0; font: 13px/1.6 ui-monospace, Menlo, monospace; }
+  ol.calls li .f { display: inline-block; min-width: 58px; margin-right: 4px; color: var(--mute); }
+  ol.calls li .t { color: var(--mute); margin-left: 6px; }
+  ol.calls li.dim { color: var(--mute); }
+  ol.calls li.pending { color: var(--mute); font-style: italic; }
+  ol.calls li.note { font-family: inherit; color: var(--mute); }
+  .rule { margin: 0 0 8px; }
+  .wait { font: 600 44px/1 Georgia, serif; margin: 2px 0 10px; }
+  .wait small { font: 14px -apple-system, Arial, sans-serif; color: var(--mute); }
+  .timer { font-size: 13px; color: #3a3a36; }
+  .bar { height: 6px; background: #ece9de; border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--ink); }
+  .bar.done i { background: #2b9a54; }
+  .held { color: #a8480d; font-size: 13px; margin: 6px 0 0; }
+
+  table.waits { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.waits td { padding: 6px 8px; border-top: 1px solid var(--line); }
+  table.waits td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+  table.waits td.n { font: 600 20px/1 Georgia, serif; }
+  table.waits td small { display: block; color: var(--mute); font-size: 13px; margin-top: 2px; }
+  table.waits tr.hit td, .hit { background: #fff1b8; }
+  .crossing { margin: 12px 0 0; padding: 6px 8px; font-size: 14px; }
+  ul.notes { margin: 10px 0 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--mute); }
+  ul.notes li { padding: 3px 8px; }
+  details { margin-top: 14px; }
+  summary { cursor: pointer; font-size: 14px; margin-bottom: 10px; }
+  .code h3 { font: 600 16px/1.2 Georgia, serif; margin: 0 0 10px; }
+
+  section.code { margin-top: 10px; padding-bottom: 60px; }
+  section.code p { color: #3a3a36; max-width: 80ch; margin: 0 0 10px; }
+  pre { background: #1b1b19; color: #eceadf; padding: 16px 18px; border-radius: 10px; overflow: auto; font: 12.5px/1.55 ui-monospace, Menlo, monospace; margin: 0; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } .cols { grid-template-columns: 1fr; } .strip { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<p style="margin:0;padding:6px 12px;background:#1F1F1F;color:#FFF;font:500 12px/1.3 -apple-system, 'Helvetica Neue', Arial, sans-serif">Reference page for the Year in Games 2026 build. Not the live experience.</p>
+
+<header class="top">
+  <h1>Copy timing and navigation</h1>
+  <p class="lede">This page plays the rules from the engineering guide (<code>engineering-guide.md</code>: Settings, Rules and Copy timing) with stand-in rooms. Tap through the cards, or click any card to open straight on it, and see the same few Rive calls and the one rule that sets the wait.</p>
+  <p class="lede">How the copy moves on each card: <a href="text-motion.html">the text motion page</a>.</p>
+  <div class="cssnote" id="cssnote" hidden>The text CSS wasn't found at <code>yig-text-motion.css</code>. Keep this page beside it.</div>
+
+  <div class="stripbar">
+    <h2 style="margin:0">Cards</h2>
+    <div class="seg" id="players" role="group" aria-label="Player">
+      <button data-player="several" aria-pressed="true">Subscriber, several games</button>
+      <button data-player="one" aria-pressed="false">Subscriber, one game</button>
+      <button data-player="anon" aria-pressed="false">Anonymous</button>
+    </div>
+    <button class="link" id="restart">Start over</button>
+    <span class="hint">Click a card to open on it.</span>
+  </div>
+  <div class="strip" id="strip"></div>
+</header>
+
+<main>
+  <div>
+    <div class="phone" id="phone">
+      <div class="backdrop" id="backdrop"></div>
+      <div class="rooms" id="rooms"></div>
+      <div class="lockup" id="lockup" hidden></div>
+      <div class="copy" id="copy"></div>
+    </div>
+    <div class="controls">
+      <button id="back">Back</button>
+      <button id="next" class="next">Next</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel" id="readout">
+      <h2>This tap</h2>
+      <p class="tapline" id="tapline">Tap Next to begin.</p>
+      <div class="cols">
+        <div>
+          <h2>What the code set on Rive</h2>
+          <ol class="calls" id="calls"><li class="note">Nothing yet.</li></ol>
+        </div>
+        <div>
+          <h2>Rule that applied</h2>
+          <p class="rule" id="rule">&nbsp;</p>
+          <h2>The wait</h2>
+          <div class="wait" id="wait" data-ms="">&ndash;</div>
+          <div class="timer" id="timer">&nbsp;</div>
+          <div class="bar" id="bar"><i></i></div>
+          <p class="held" id="held" hidden></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>All the waits</h2>
+      <table class="waits" id="waits"></table>
+      <p class="crossing" id="crossing" data-key="crossing"></p>
+      <ul class="notes">
+        <li data-key="note-start">Opened on a scene with startScene: the copy appears right away.</li>
+        <li data-key="note-settle">A tap while copy is still on its way doesn't restart the wait.</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<section class="code">
+  <h2>The code you write for a tap</h2>
+  <h3>Every move sets these, in this order</h3>
+  <pre id="setscene"></pre>
+  <p style="margin-top:12px">The rest of the tap code picks the wait from the four rules above, and <code>files[n].rive.viewModelInstance</code> is where your Rive objects go. A crossing between two files adds two of the waits together.</p>
+  <details>
+    <summary>Show the full tap code</summary>
+    <pre id="yourcode"></pre>
+  </details>
+  <p style="margin-top:16px">Everything else in this file (the stand-in phone, rooms, lockup and readout) is the page's own plumbing, kept in a separate script. You don't write it.</p>
+</section>
+
+<!-- ============================================================================================================
+     Page plumbing, not part of what you write: the stand-in rooms and Rive, the copy layer, the readout, the strip.
+
+     Stand-in for reference/yig-integration.js: that file is an ES module that imports the Rive runtime, so it can't run
+     from a double-click, and its decisions are mixed in with Rive objects. The tap code below mirrors the decisions in its
+     move() function (landing, two-move crossings, first visit, the copy delay) and calls the same properties in the guide's order.
+     ============================================================================================================ -->
+<script id="plumbing">
+// ---- shared state the tap code reads and writes
+let cards = [], frame = 0, files = [], player = "several";
+let seenAds = new Set(), visited = new Set(), copyFrom = {}, pan = { dir: 0, endsAt: 0 };
+let heldTimer = 0, swapTimer = 0, hopTimer = 0, hopRun = null;
+
+const GAME_ORDER = ["wordle", "connections", "spelling-bee", "mini", "midi", "crossword", "strands"];
+const COMMUNITY_GAMES = ["wordle", "connections", "spelling-bee", "mini", "strands"];
+const NAMES = { wordle: "Wordle", connections: "Connections", "spelling-bee": "Spelling Bee", mini: "The Mini", midi: "The Midi", crossword: "The Crossword", strands: "Strands" };
+
+// A time from yig-text-motion.css, in ms. Returns the stylesheet's own value if the file is missing, and says so on the page.
+function cssMs(name) {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const ms = v.endsWith("ms") ? parseFloat(v) : parseFloat(v) * 1000;
+  if (!Number.isFinite(ms)) { document.getElementById("cssnote").hidden = false; return { "--yig-first-visit": 2000, "--yig-lockup": 3200, "--yig-clear": 340 }[name]; }
+  return ms;
+}
+const secs = (ms) => (ms / 1000).toFixed(2).replace(/0$/, "");
+
+// ---- card lists, from the guide's Scenes table: several games, one game, and the anonymous list
+function buildCards(kind) {
+  const c = [];
+  const add = (file, scene, label, extra = {}) => c.push({ file, scene, label, ...extra });
+  add(1, "loading", "Loading"); add(1, "start", "Start"); add(1, "ad", "Ad 1", { ad: true });
+  for (const scene of ["chapter-1", "chapter-1-2", "chapter-1-3", "chapter-1-4", "chapter-1-5"]) add(1, scene, scene);
+  add(1, "ad", "Ad 2", { ad: true });
+  add(2, "chapter-2", "chapter-2");
+  const community = (own) => GAME_ORDER.filter((g) => COMMUNITY_GAMES.includes(g) && g !== own);
+  const games = (g, n) => { for (let i = 1; i <= n; i++) add(2, g, `${NAMES[g]} ${i} of ${n}`, { icon: g }); };
+  const comm = (g) => add(2, g, `${NAMES[g]} (community)`, { community: true, icon: g });
+  let top = "wordle";
+  if (kind === "several") { games("wordle", 4); games("spelling-bee", 2); games("strands", 1); }
+  if (kind === "one") { games("connections", 5); add(2, "chapter-2-community-intro", "chapter-2-community-intro"); community("connections").forEach(comm); top = "connections"; }
+  if (kind === "anon") { community("wordle").forEach(comm); add(2, "to-chapter-3", "Ad 3", { ad: true }); }
+  add(3, "chapter-3", "chapter-3"); add(3, "chapter-3-2", "chapter-3-2");
+  if (kind === "anon") { add(3, "chapter-3-event-badges", "chapter-3-event-badges (1)"); add(3, "chapter-3-event-badges", "chapter-3-event-badges (2)"); }
+  else { add(3, "chapter-3-personal-badges", "chapter-3-personal-badges"); add(3, "chapter-3-event-badges", "chapter-3-event-badges"); }
+  add(3, "chapter-4", "chapter-4", { topGame: top, reveal: false });
+  add(3, "chapter-4-top-game", "chapter-4-top-game", { icon: top, reveal: true });
+  add(3, "chapter-4-editor-video", "chapter-4-editor-video", { reveal: true });
+  add(3, "end", "end");
+  if (kind !== "anon") add(3, "share", "share");
+  c.forEach((x) => { x.sub = `File ${x.file} · ${x.scene}`; });
+  return c;
+}
+
+// ---- stand-in colours: made-up colours, only to tell the rooms apart
+const WALLS = { wordle: "#B9DDA0", connections: "#C9B8F0", "spelling-bee": "#F5E08A", mini: "#C0D8F8", midi: "#7EAAF1", crossword: "#8FB0F0", strands: "#E3B88F" };
+function colorsFor(file, scene, reveal, topGame) {
+  if (file === 1 || scene === "from-chapter-1") return ["#F1ECC0", "#FF811E"];
+  if (file === 2) return scene === "to-chapter-3" ? ["#CDBEF2", "#7FCB8A"] : [WALLS[scene] || "#F6D9A8", "#F7A8C4"];
+  if (scene.startsWith("chapter-4")) return [reveal ? WALLS[topGame] : "#BFD9F7", "#7FCB8A"];
+  return scene === "end" || scene === "share" ? ["#F4C7B8", "#7FCB8A"] : ["#CDBEF2", "#7FCB8A"];
+}
+
+// ---- stand-in Rive: one per file, with the view model the guide describes. It records every set, then moves the stage.
+const riveStandIn = {
+  shown: 1,
+  state: [],
+  mount(n, reset) {   // a file opened fresh (the page start, or startScene on a jump)
+    const opens = FILES[n - 1].opens;
+    this.state[n - 1] = { direction: "forward", lockup: true, reveal: false, topGame: "wordle", scene: reset ? null : opens, startScene: reset ? null : opens, booted: !reset, room: reset ? null : opens, seen: new Set([opens]) };
+  },
+  vm(n) {
+    const st = () => this.state[n - 1], self = this;
+    const prop = (name) => ({
+      get value() { return st()[name]; },
+      set value(v) {
+        const same = st()[name] === v;
+        readout.call(n, name, v, same);
+        if (name === "startScene") { st().startScene = v; return; }
+        if (same) return;   // setting the value it already has does nothing
+        st()[name] = v;
+        if (name === "scene") self.sceneSet(n, v);
+        if (name === "reveal" && n === 3) self.recolor();
+      },
+    });
+    return { enum: prop, boolean: prop };
+  },
+  sceneSet(n, scene) {
+    const s = this.state[n - 1];
+    const instant = !s.booted && s.startScene === scene;   // startScene: opens already built, no pan, no intro
+    s.booted = true;
+    const room = roomOf(n, scene);
+    const sameRoomAgain = !instant && s.room === room;     // a scene that shares the room the file is already in: no pan, the room keeps looping
+    s.room = room;
+    if (sameRoomAgain) { if (n === this.shown) this.recolor(); return; }
+    const dir = s.direction === "forward" ? 1 : -1;
+    const intro = !instant && dir > 0 && !s.seen.has(room) && !FILES[n - 1].noIntro.includes(room);
+    s.seen.add(room);
+    if (n !== this.shown) return;
+    stage.pan(n, scene, dir, instant, intro && n === 2 && GAME_ORDER.includes(scene) && s.lockup, intro);
+    this.recolor();
+  },
+  recolor() {
+    const s = this.state[this.shown - 1];
+    stage.colors(this.shown, s.scene, this.state[2].reveal, this.state[2].topGame);
+  },
+  show(n) {   // a file's canvas goes on top; the file left behind rests
+    if (n === this.shown) return;
+    this.shown = n;
+    readout.note(`File ${n} shown`);
+    const s = this.state[n - 1];
+    stage.sync(n, s.scene);
+    this.recolor();
+  },
+};
+
+// ---- the stand-in stage: a colour backdrop that crossfades, and rooms that pan
+const stage = {
+  current: null, lockupTimer: 0, introTimer: 0,
+  reset() { document.getElementById("rooms").innerHTML = ""; this.current = null; clearTimeout(this.lockupTimer); clearTimeout(this.introTimer); document.getElementById("lockup").hidden = true; },
+  colors(file, scene, reveal, top) {
+    const [wall, floor] = colorsFor(file, scene, reveal, top);
+    const b = document.getElementById("backdrop");
+    b.style.setProperty("--wall", wall); b.style.setProperty("--floor", floor);
+  },
+  make(file, scene, caption) {
+    const el = document.createElement("div");
+    const picture = FILES[file - 1].noIntro.includes(scene);
+    el.className = "room" + (picture ? " picture" : "");
+    el.innerHTML = `<div class="prop"></div><div class="ball"></div><div class="tag">File ${file} · ${scene}<em>${picture ? "empty room" : caption || ""}</em></div>`;
+    return el;
+  },
+  sync(file, scene) {   // swap the picture for the same picture in another file; nothing moves
+    if (!this.current) return;
+    const el = this.make(file, scene);
+    this.current.el.replaceWith(el);
+    this.current = { file, scene, el };
+  },
+  pan(file, scene, dir, instant, lockup, intro) {
+    const rooms = document.getElementById("rooms");
+    const el = this.make(file, scene, intro ? "intro" : "loop");
+    const old = this.current;
+    this.current = { file, scene, el };
+    clearTimeout(this.lockupTimer); clearTimeout(this.introTimer);
+    const lk = document.getElementById("lockup");
+    lk.hidden = true;
+    rooms.append(el);
+    if (instant || !old) { old?.el.remove(); return; }
+    el.style.transform = `translateX(${dir > 0 ? 100 : -100}%)`;
+    void el.offsetWidth;
+    const move = "transform 1600ms cubic-bezier(.65,0,.35,1)";
+    el.style.transition = move; old.el.style.transition = move;
+    el.style.transform = "none"; old.el.style.transform = `translateX(${dir > 0 ? -100 : 100}%)`;
+    setTimeout(() => old.el.remove(), 1700);
+    if (lockup) {
+      lk.textContent = `${NAMES[scene]} lockup`; lk.hidden = false;
+      this.lockupTimer = setTimeout(() => { lk.hidden = true; }, cssMs("--yig-lockup"));   // gone exactly when the copy may start
+    }
+    if (intro) this.introTimer = setTimeout(() => { const t = el.querySelector(".tag em"); if (t) t.textContent = "loop"; }, 3200);   // every intro is exactly 3.2 s
+  },
+};
+
+// ---- the copy layer: the real classes from yig-text-motion.css, driven as the reference integration drives them
+const copyEls = {}, iconEls = {};
+function copyEl(n) {
+  if (!copyEls[n]) {
+    const el = document.createElement("div");
+    el.className = "yig-text"; el.hidden = true;
+    el.innerHTML = `<span class="yig-mask"><span class="yig-line">${cards[n].label}</span></span><span class="yig-mask"><span class="yig-line sub">${cards[n].sub}</span></span>`;
+    document.getElementById("copy").append(el);
+    copyEls[n] = el;
+  }
+  return copyEls[n];
+}
+function iconEl(game) {
+  if (!iconEls[game]) {
+    const el = document.createElement("div");
+    el.className = "yig-icon"; el.hidden = true;
+    el.innerHTML = `<span class="yig-pop">${NAMES[game][0]}</span>`;
+    document.getElementById("copy").prepend(el);
+    iconEls[game] = el;
+  }
+  return iconEls[game];
+}
+function showCopy(n, { changed, delay, back = false }) {
+  const visible = [...document.querySelectorAll(".yig-text:not([hidden]), .yig-icon:not([hidden])")];
+  visible.filter((el) => changed || !el.classList.contains("yig-icon")).forEach((el) => leave(el, back));
+  const next = copyEl(n);
+  const icon = cards[n].icon && iconEl(cards[n].icon);
+  const iconStays = !changed && icon && !icon.hidden;
+  if (delay === null && changed) delay = cssMs("--yig-clear");
+  if (icon && !iconStays) enter(icon, { delay, back });
+  enter(next, delay === null ? { quick: true, back } : { delay, afterIcon: !!icon && !iconStays, back });
+}
+function leave(el, back) {
+  const settled = el.getAnimations({ subtree: true }).every((a) => a.playState === "finished");
+  if (settled) {
+    el.classList.toggle("yig-back", back); el.classList.add("yig-out");
+    setTimeout(() => { if (el.classList.contains("yig-out")) el.hidden = true; }, cssMs("--yig-clear"));
+  } else el.hidden = true;
+}
+function enter(el, { quick = false, delay = null, afterIcon = false, back = false } = {}) {
+  el.classList.remove("yig-in", "yig-out");
+  el.classList.toggle("yig-quick", quick); el.classList.toggle("yig-after-icon", afterIcon); el.classList.toggle("yig-back", back);
+  if (delay === null) el.style.removeProperty("--yig-delay"); else el.style.setProperty("--yig-delay", `${delay}ms`);
+  el.hidden = false; void el.offsetWidth; el.classList.add("yig-in");
+}
+
+// ---- the readout, the waits table and the strip
+// The three waits and what each means; every rule the code picks maps onto them (RULE_KEYS), so the readout and the table agree.
+const RULES = {
+  "first-visit": { say: (ms) => `A new room: ${secs(ms)} s` },
+  lockup: { say: (ms) => `A new room, with a lockup: ${secs(ms)} s (a Chapter 2 game's first card)` },
+  comeback: { say: (ms) => `A room already built: ${secs(ms)} s (Back, or a room seen before)` },
+  picture: { say: (ms) => `A room already built: ${secs(ms)} s (an empty room)` },
+  "ad-first": { say: (ms) => `A room already built: ${secs(ms)} s (an ad)` },
+  "skip-in": { say: (ms) => `A room already built: ${secs(ms)} s (a seen ad is skipped)` },
+  "same-room": { say: (ms) => `The same room: ${secs(ms)} s` },
+  reveal: { say: (ms) => `Chapter 4's reveal: ${secs(ms)} s (reveal changed, so the copy waits for the wall's fade)` },
+  "two-first": { say: (ms) => `Crossing between two files: ${secs(PAN_MS)} + ${secs(ms - PAN_MS)} = ${secs(ms)} s` },
+  "two-back": { say: (ms) => `Crossing between two files: ${secs(PAN_MS)} + ${secs(ms - PAN_MS)} = ${secs(ms)} s` },
+  "skip-across": { say: (ms) => `Crossing between two files, a seen ad skipped: ${secs(PAN_MS)} + ${secs(ms - PAN_MS)} = ${secs(ms)} s` },
+  settle: { say: (ms) => `Copy still on its way: the wait isn't restarted, it arrives ${secs(ms)} s from now` },
+  jump: { say: () => "Opened on a scene with startScene: the copy appears right away" },
+};
+// which rows of the table (and lines under it) each rule lights up
+const RULE_KEYS = {
+  "first-visit": ["new"], lockup: ["new"], comeback: ["built"], picture: ["built"], "ad-first": ["built"], "skip-in": ["built"],
+  "same-room": ["same"], reveal: ["reveal"], "two-first": ["new", "built", "crossing"], "two-back": ["built", "crossing"], "skip-across": ["built", "crossing"],
+  settle: ["note-settle"], jump: ["note-start"],
+};
+
+const readout = {
+  paint() { paintStrip(); },
+  t0: 0, timer: null, groupAt: 0, hasCalls: false, pending: null,
+  reset() { this.clear(); document.getElementById("tapline").textContent = "Tap Next to begin."; this.setWait(null); document.getElementById("rule").innerHTML = "&nbsp;"; document.getElementById("timer").innerHTML = "&nbsp;"; document.getElementById("calls").innerHTML = '<li class="note">Nothing yet.</li>'; this.hit(null); },
+  clear() { this.timer = null; document.getElementById("held").hidden = true; },
+  tap(label, extra) { this.t0 = performance.now(); this.hasCalls = false; this.pending = null; this.clear(); document.getElementById("tapline").textContent = label; document.getElementById("calls").innerHTML = ""; if (extra) this.line("note", extra); },
+  line(cls, html) { const li = document.createElement("li"); li.className = cls; li.innerHTML = html; document.getElementById("calls").append(li); return li; },
+  call(file, name, value, same) {
+    this.hasCalls = true;
+    const t = performance.now() - this.t0;
+    if (this.pending && t > 100) { this.pending.remove(); this.pending = null; }
+    const after = t > 100 ? `<span class="t">after ${secs(t)} s</span>` : "";
+    this.line(same ? "dim" : "", `<span class="f">File ${file}</span>${name} = ${typeof value === "string" ? `'${value}'` : value}${same ? ' <span class="t">(already this)</span>' : ""}${after}`);
+  },
+  note(text) { this.line("dim", `<span class="f"></span>${text}`); },
+  twoMoves(legs) { if (legs === 2) this.pending = this.line("pending", "then the second move, after 1.65 s"); },
+  held(ms) { const h = document.getElementById("held"); h.hidden = false; h.textContent = `Held: a Back during a pan waits ${secs(ms)} s for the pan to end, then runs.`; },
+  nothing(msg) { this.tap(msg); this.line("note", "Nothing was set."); this.setWait(null); document.getElementById("rule").innerHTML = "&nbsp;"; document.getElementById("timer").innerHTML = "&nbsp;"; this.hit(null); },
+  wait(rule, ms) {
+    if (!this.hasCalls && !this.pending) this.line("note", "Nothing set: the card stays in the same room, and Rive keeps looping.");
+    document.getElementById("held").hidden = true;
+    document.getElementById("rule").textContent = RULES[rule].say(ms);
+    document.getElementById("rule").dataset.rule = rule;
+    this.setWait(ms); this.hit(rule);
+    const start = performance.now(); const me = (this.timer = {});
+    const bar = document.getElementById("bar"), fill = bar.firstElementChild, tm = document.getElementById("timer");
+    bar.classList.remove("done");
+    const tick = () => {
+      if (this.timer !== me) return;
+      const el = performance.now() - start;
+      if (el >= ms) { fill.style.width = "100%"; bar.classList.add("done"); tm.textContent = ms === 0 ? "Copy shows at once." : `Copy is on (${secs(ms)} s).`; return; }
+      fill.style.width = `${(el / ms) * 100}%`; tm.textContent = `Copy starts in ${secs(ms - el)} s`;
+      requestAnimationFrame(tick);
+    };
+    tick();
+  },
+  setWait(ms) { const w = document.getElementById("wait"); w.dataset.ms = ms ?? ""; w.innerHTML = ms === null ? "&ndash;" : `${secs(ms)} <small>s</small>`; document.getElementById("bar").firstElementChild.style.width = "0"; },
+  hit(rule) { const keys = rule ? RULE_KEYS[rule] : []; document.querySelectorAll("[data-key]").forEach((el) => el.classList.toggle("hit", keys.includes(el.dataset.key))); },
+};
+
+function renderTable() {
+  const rows = [
+    ["new", "A new room", FIRST_VISIT_MS, `${secs(LOCKUP_MS)} s for a Chapter 2 game's first card, because of its lockup`],
+    ["built", "A room already built", PAN_MS, "Back, a room seen before, an empty room, or an ad"],
+    ["same", "The same room", CLEAR_MS, "Another card in the room, or another scene that shares the room (chapter-3-2, the badge scenes, chapter-4-editor-video, share)"],
+    ["reveal", "Chapter 4's reveal", REVEAL_MS, "chapter-4 to chapter-4-top-game, and Back from chapter-4-top-game to chapter-4: reveal changes and the wall fades"],
+  ];
+  document.getElementById("waits").innerHTML = rows.map(([key, name, ms, sub]) =>
+    `<tr data-key="${key}"><td>${name}<small>${sub}</small></td><td class="n">${secs(ms)} s</td></tr>`).join("");
+  document.getElementById("crossing").textContent =
+    `Crossing between two files adds two waits together: ${secs(PAN_MS)} + ${secs(FIRST_VISIT_MS)} = ${secs(PAN_MS + FIRST_VISIT_MS)} s forward, ${secs(PAN_MS)} + ${secs(PAN_MS)} = ${secs(2 * PAN_MS)} s back.`;
+}
+
+function renderStrip() {
+  const strip = document.getElementById("strip");
+  const names = ["yig-ch1.riv", "yig-ch2.riv", "yig-ch3.riv"], dots = ["var(--f1)", "var(--f2)", "var(--f3)"];
+  strip.innerHTML = [1, 2, 3].map((f) => `<div class="file"><h3><i style="background:${dots[f - 1]}"></i>File ${f} <small>${names[f - 1]}</small></h3><div class="chips">` +
+    cards.map((c, i) => c.file === f ? `<button class="chip${c.ad ? " ad" : ""}" data-i="${i}" title="File ${f} · ${c.scene}"><b>${i}</b>${c.label}</button>` : "").join("") + `</div></div>`).join("");
+  paintStrip();
+}
+function paintStrip() {
+  document.querySelectorAll(".chip").forEach((b) => {
+    const i = +b.dataset.i;
+    b.classList.toggle("now", i === frame);
+    b.classList.toggle("seen", i !== frame && seenAds.has(i));
+  });
+}
+
+function show(file) { riveStandIn.show(file); }
+
+function reset(kind) {
+  clearTimeout(heldTimer); clearTimeout(swapTimer); clearTimeout(hopTimer); hopRun = null;
+  player = kind; cards = buildCards(kind); frame = 0;
+  seenAds = new Set(); copyFrom = {}; pan = { dir: 0, endsAt: 0 };
+  visited = new Set(FILES.map((f, i) => `${i + 1}:${f.opens}`));
+  [1, 2, 3].forEach((n) => riveStandIn.mount(n, false));
+  files = [1, 2, 3].map((n) => ({ rive: { viewModelInstance: riveStandIn.vm(n) } }));
+  riveStandIn.shown = 1;
+  stage.reset();
+  document.getElementById("copy").innerHTML = ""; Object.keys(copyEls).forEach((k) => delete copyEls[k]); Object.keys(iconEls).forEach((k) => delete iconEls[k]);
+  const bd = document.getElementById("backdrop");
+  bd.style.transition = "none"; stage.pan(1, "loading", 1, true); riveStandIn.recolor(); void bd.offsetWidth; bd.style.transition = "";
+  readout.reset(); renderStrip();
+  showCopy(0, { changed: true, delay: 0 });
+}
+</script>
+
+<!-- ============================================================================================================
+     What you write for a tap. The page shows this block as it runs; lines starting "readout." only feed the readout.
+     ============================================================================================================ -->
+<script id="tapcode">
+// The two first-visit times live in yig-text-motion.css (the guide's Copy timing); the other waits are fixed numbers.
+const FIRST_VISIT_MS = cssMs("--yig-first-visit");   // 2.0 s: a room's first visit
+const LOCKUP_MS = cssMs("--yig-lockup");             // 3.2 s: a Chapter 2 game's first card, with its lockup
+const CLEAR_MS = cssMs("--yig-clear");               // 0.34 s: the old copy has cleared
+const PAN_MS = 1650;                                 // 1.6 s pan plus a few frames
+const REVEAL_MS = 1450;                              // 1.45 s: Chapter 4's wall fades when reveal changes
+
+// Each file's first and last picture, and the scenes that have no intro of their own.
+const FILES = [
+  { opens: "loading", ends: "ad", noIntro: ["loading", "ad"] },
+  { opens: "from-chapter-1", ends: "to-chapter-3", noIntro: ["from-chapter-1", "to-chapter-3"] },
+  { opens: "ad", ends: "end", noIntro: ["ad"] },
+];
+// Scenes that share one room or picture (File 3). A move between two of them is no room change: no pan, the room keeps
+// looping, and the copy swaps after 0.34 s (1.45 s when the move changes reveal). The first scene in a list owns the room.
+const ROOMS = [
+  ["ad", "chapter-3-personal-badges", "chapter-3-event-badges"],
+  ["chapter-3", "chapter-3-2"],
+  ["chapter-4", "chapter-4-top-game", "chapter-4-editor-video"],
+  ["end", "share"],
+];
+const roomOf = (file, scene) => (file === 3 ? ROOMS.find((l) => l.includes(scene))?.[0] : null) ?? scene;
+const lockupShows = (card) => card.file === 2 && GAME_ORDER.includes(card.scene) && !card.community;
+const isPicture = (card) => FILES[card.file - 1].noIntro.includes(roomOf(card.file, card.scene));
+
+// The same Rive calls on every move, in this order.
+function setScene(file, card, step) {
+  const vm = files[file - 1].rive.viewModelInstance;
+  vm.enum("direction").value = step > 0 ? "forward" : "back";
+  if (file === 2) vm.boolean("lockup").value = !card.community;
+  if (file === 3 && card.reveal !== undefined) vm.boolean("reveal").value = card.reveal;
+  vm.enum("scene").value = card.scene;
+}
+
+// The card a tap lands on: the next one that way, leaving out any ad already seen.
+function landing(step) {
+  let target = frame + step;
+  while (cards[target]?.ad && seenAds.has(target)) target += step;
+  return target;
+}
+
+// Crossing to another file from a card that isn't on the empty room takes two moves.
+function movesBetween(from, to, step) {
+  if (to.file === from.file) return 1;
+  return (step > 0 ? from.scene !== FILES[from.file - 1].ends : to.scene !== FILES[to.file - 1].ends) ? 2 : 1;
+}
+
+function go(step) {
+  clearTimeout(heldTimer);
+  const target = landing(step);
+  if (target < 1 && step < 0) return readout.nothing("Back on Start does nothing, and Back never returns to Loading.");
+  if (target > cards.length - 1) return readout.nothing("Next on the last card does nothing.");
+  const from = cards[frame], to = cards[target];
+  const skipped = target !== frame + step;
+  const sceneChange = to.file !== from.file || to.scene !== from.scene;
+  // a change between scenes that share a room (ROOMS) sets the scene, with no pan
+  const roomChange = to.file !== from.file || roomOf(to.file, to.scene) !== roomOf(from.file, from.scene);
+  const legs = movesBetween(from, to, step);
+  const now = performance.now();
+  // A Back during a pan, or a Next during a Back pan, waits for the pan to end.
+  if (roomChange && pan.endsAt > now && (step < 0 || pan.dir < 0)) {
+    readout.held(pan.endsAt - now);
+    heldTimer = setTimeout(() => go(step), pan.endsAt - now);
+    return;
+  }
+  if (roomChange) clearTimeout(swapTimer);
+  if (sceneChange && hopRun) { clearTimeout(hopTimer); hopRun(); }   // a new tap cuts a Next's two moves short (also a scene that shares the room, so its scene isn't overwritten later)
+  readout.tap(`${step > 0 ? "Next" : "Back"} to ${to.label}`, skipped ? `${cards[frame + step].label} was already seen, so the tap skips it.` : "");
+  frame = target;
+  if (to.ad) seenAds.add(target);
+  const key = `${to.file}:${roomOf(to.file, to.scene)}`;
+  const firstVisit = roomChange && step > 0 && !visited.has(key) && !FILES[to.file - 1].noIntro.includes(roomOf(to.file, to.scene));
+  // Chapter 4: a move inside the room that changes reveal fades the wall (1.45 s); read it before the move sets it
+  const revealing = !roomChange && to.reveal !== undefined && files[to.file - 1].rive.viewModelInstance.boolean("reveal").value !== to.reveal;
+  if (!roomChange && sceneChange) setScene(to.file, to, step);   // same room: it keeps looping, the copy swaps
+
+  if (roomChange) {
+    pan = { dir: step, endsAt: now + PAN_MS * legs };
+    if (to.file === from.file) {
+      setScene(to.file, to, step);
+    } else if (step > 0) {
+      // Next into the next file: show it and set its scene in the same frame.
+      const takeOver = () => { hopRun = null; show(to.file); setScene(to.file, to, step); };
+      if (legs === 1) takeOver();
+      else {
+        // first the room pans out to the empty room, then the next file takes over
+        readout.twoMoves(legs);
+        setScene(from.file, { scene: FILES[from.file - 1].ends }, step);
+        hopRun = takeOver;
+        hopTimer = setTimeout(takeOver, PAN_MS);
+      }
+    } else {
+      // Back into the earlier file: pan back to the shared picture, hand the stage back, then pan into the card.
+      readout.twoMoves(legs);
+      setScene(from.file, { scene: FILES[from.file - 1].opens }, step);
+      swapTimer = setTimeout(() => { show(to.file); if (legs === 2) setScene(to.file, to, step); }, PAN_MS);
+    }
+  }
+
+  if (firstVisit) {
+    visited.add(key);
+    copyFrom[key] = now + (legs - 1) * PAN_MS + (lockupShows(to) ? LOCKUP_MS : FIRST_VISIT_MS);
+  }
+  const settleLeft = Math.max(0, (copyFrom[key] ?? 0) - now);   // a first visit's copy is never earlier than its time
+  let wait, rule;
+  if (!roomChange) {
+    if (revealing) { wait = Math.max(settleLeft, REVEAL_MS); rule = "reveal"; }
+    else if (settleLeft > 0) { wait = settleLeft; rule = "settle"; }
+    else { wait = CLEAR_MS; rule = "same-room"; }
+  } else if (firstVisit) {
+    wait = copyFrom[key] - now;
+    rule = legs === 2 ? "two-first" : lockupShows(to) ? "lockup" : "first-visit";
+  } else {
+    wait = Math.max(PAN_MS * legs, settleLeft);
+    rule = skipped ? (legs === 2 ? "skip-across" : "skip-in") : legs === 2 ? "two-back" : to.ad ? "ad-first" : isPicture(to) ? "picture" : "comeback";
+  }
+  showCopy(target, { changed: roomChange || to.icon !== from.icon, delay: rule === "same-room" ? null : wait, back: step < 0 });
+  readout.wait(rule, wait);
+  readout.paint();
+}
+
+// Opening straight on a card (the guide's Rules, startScene): File 3 takes topGame and reveal first, then startScene, then scene.
+function openOn(index) {
+  clearTimeout(heldTimer); clearTimeout(swapTimer); clearTimeout(hopTimer); hopRun = null;
+  const card = cards[index];
+  readout.mount(card.file);
+  readout.tap(`Opened on ${card.label}`);
+  const vm = files[card.file - 1].rive.viewModelInstance;
+  if (card.file === 3) {
+    vm.enum("topGame").value = cards.find((c) => c.topGame).topGame;
+    if (card.reveal !== undefined) vm.boolean("reveal").value = card.reveal;
+  }
+  vm.enum("startScene").value = card.scene;
+  vm.enum("scene").value = card.scene;
+  show(card.file);
+  frame = index;
+  visited = new Set([`${card.file}:${roomOf(card.file, card.scene)}`]);   // a freshly opened file has seen no other room
+  seenAds = new Set(card.ad ? [index] : []);
+  copyFrom = {}; pan = { dir: 0, endsAt: 0 };
+  showCopy(index, { changed: true, delay: 0 });
+  readout.wait("jump", 0);
+  readout.paint();
+}
+</script>
+
+<script id="wiring">
+// readout helpers the tap code calls that need the stand-in Rive
+readout.mount = (n) => {
+  riveStandIn.mount(n, true);
+  [1, 2, 3].forEach((m) => { if (m < n) riveStandIn.mount(m, false), riveStandIn.state[m - 1].scene = FILES[m - 1].ends; if (m > n) riveStandIn.mount(m, false); });
+  riveStandIn.shown = n;
+  stage.reset();
+};
+// The code shown on the page is the tap code, minus the lines that only feed the readout.
+document.getElementById("yourcode").textContent = document.getElementById("tapcode").textContent
+  .split("\n").filter((l) => !/^\s*readout\./.test(l))
+  .map((l) => l.replace(/return readout\.nothing\([^;]*\);/, "return;"))
+  .join("\n").trim();
+
+document.getElementById("setscene").textContent = (/function setScene[\s\S]*?\n}\n/.exec(document.getElementById("yourcode").textContent) || [""])[0].trim();
+
+document.getElementById("next").onclick = () => go(1);
+document.getElementById("back").onclick = () => go(-1);
+document.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
+document.getElementById("strip").onclick = (e) => { const b = e.target.closest(".chip"); if (b) openOn(+b.dataset.i); };
+document.getElementById("restart").onclick = () => reset(player);
+document.getElementById("players").onclick = (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#players button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  reset(b.dataset.player);
+};
+renderTable();
+reset("several");
+</script>
+</body>
+</html>

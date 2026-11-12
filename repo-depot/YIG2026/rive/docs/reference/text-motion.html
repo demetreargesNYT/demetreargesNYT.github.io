@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Year in Games 2026: how the copy moves</title>
+<link rel="icon" href="data:,">
+<!-- The real text CSS and the real framing variables (--yig-copy-top, --yig-copy-side). Neither is copied here. Keep this
+     page beside yig-text-motion.css, with example/ next to it. -->
+<link rel="stylesheet" href="yig-text-motion.css">
+<link rel="stylesheet" href="example/yig-framing.css">
+<style>
+  :root { --ink: #121212; --mute: #6b6b66; --line: #dcd9cf; --paper: #faf8f1; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.45 -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  header, main, section { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  header { padding-top: 28px; }
+  h1 { font: 600 28px/1.15 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
+  h2 { font: 600 12px/1 -apple-system, Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin: 0 0 10px; }
+  .lede { margin: 0 0 4px; color: #3a3a36; }
+  .lede a, .link a { color: inherit; }
+  .link { margin: 0; color: var(--mute); font-size: 14px; }
+  .cssnote { margin-top: 8px; padding: 8px 12px; background: #fbe3dc; border-radius: 6px; font-size: 13px; }
+  main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; margin-top: 22px; align-items: start; }
+
+  /* the stand-in phone: the design's 375 x 812 frame, a flat wall and floor, no Rive */
+  .phone-wrap { width: calc(375px * var(--k, 1) + 16px); }
+  .phone { width: 375px; height: 812px; border: 8px solid var(--ink); border-radius: 40px; position: relative; overflow: hidden;
+    transform: scale(var(--k, 1)); transform-origin: 0 0; box-sizing: content-box; }
+  .room { position: absolute; inset: 0; background: linear-gradient(var(--wall, #E7F1E1) 0 72%, var(--floor, #FEA0C9) 72% 100%);
+    transition: --wall 1450ms cubic-bezier(.45, 0, .55, 1), --floor 1450ms cubic-bezier(.45, 0, .55, 1); }
+  @property --wall { syntax: "<color>"; inherits: true; initial-value: #E7F1E1; }
+  @property --floor { syntax: "<color>"; inherits: true; initial-value: #FEA0C9; }
+  .stand-in-lockup { position: absolute; left: 50%; top: 470px; transform: translateX(-50%); padding: 8px 16px; border-radius: 999px;
+    background: rgba(18, 18, 18, .75); color: #fff; font: 600 13px/1 -apple-system, Arial, sans-serif; }
+  /* the copy column, placed as the design places it */
+  .blk { position: absolute; top: var(--yig-copy-top); left: var(--yig-copy-side); right: var(--yig-copy-side); text-align: center; display: grid; justify-items: center; }
+  .blk.after-icon-slot { top: calc(var(--yig-copy-top) + 71px); }   /* below the icon (50 x 49) and a 22 px gap */
+  .headline { font: 500 24px / 1.2 "NYT Karnak", Georgia, serif; color: var(--yig-copy-ink, #121212); }
+  .yig-icon img { width: 50px; height: auto; display: block; }
+  .controls { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .controls button { padding: 9px 16px; border-radius: 999px; border: 1px solid var(--ink); background: #fff; font: inherit; font-size: 14px; cursor: pointer; }
+  .controls button.primary { background: var(--ink); color: #fff; }
+  .controls button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .cards { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 10px; max-width: 420px; }
+  .cards span { font-size: 12px; padding: 3px 7px; border: 1px solid var(--line); border-radius: 5px; background: #fff; }
+  .cards span.now { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-bottom: 18px; }
+  .tap { font: 600 18px/1.2 Georgia, serif; margin: 0 0 12px; }
+  pre { margin: 0 0 14px; background: #1b1b19; color: #eceadf; padding: 12px 14px; border-radius: 8px; overflow: auto; font: 12.5px/1.5 ui-monospace, Menlo, monospace; }
+  ol.set { margin: 0 0 12px; padding-left: 20px; font-size: 14px; }
+  ol.set li { margin-bottom: 4px; }
+  ol.set code, .delay code, td code { font: 12.5px ui-monospace, Menlo, monospace; background: #efece1; padding: 1px 5px; border-radius: 3px; }
+  .delay { margin: 0; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-weight: 600; color: var(--mute); font-size: 12px; padding: 0 8px 6px; }
+  td { padding: 7px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+  section { padding-bottom: 48px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  /* The reduced-motion toggle. A page can't switch the prefers-reduced-motion media query, so this mirrors that block of
+     yig-text-motion.css under a page class: the same selectors and the same 200 ms fades, using the CSS's own keyframes. */
+  body.reduced .yig-in .yig-line, body.reduced .yig-in .yig-pop, body.reduced .yig-in:not(:has(.yig-mask, .yig-pop)),
+  body.reduced .yig-back.yig-in .yig-line, body.reduced .yig-back.yig-in:not(:has(.yig-mask, .yig-pop)) { animation-name: yig-fade-in; animation-duration: 200ms; }
+  body.reduced .yig-out .yig-line, body.reduced .yig-out .yig-pop, body.reduced .yig-out:not(:has(.yig-mask, .yig-pop)),
+  body.reduced .yig-back.yig-out .yig-line, body.reduced .yig-back.yig-out .yig-pop, body.reduced .yig-back.yig-out:not(:has(.yig-mask, .yig-pop)) { animation-name: yig-fade-out; animation-duration: 200ms; }
+</style>
+</head>
+<body>
+<p style="margin:0;padding:6px 12px;background:#1F1F1F;color:#FFF;font:500 12px/1.3 -apple-system, 'Helvetica Neue', Arial, sans-serif">Reference page for the Year in Games 2026 build. Not the live experience.</p>
+<header>
+  <h1>How the copy moves</h1>
+  <p class="lede">Every card uses per-line motion: each designed line is its own piece and rises on its own beat.</p>
+  <p class="link">How long each card waits: <a href="timing-demo.html">the timing demo</a>.</p>
+  <div class="cssnote" id="cssnote" hidden>The text CSS wasn't found at <code>yig-text-motion.css</code>. Keep this page beside it.</div>
+</header>
+
+<main>
+  <div class="phone-wrap">
+    <div class="phone" id="phone">
+      <div class="room" id="room"></div>
+      <div class="stand-in-lockup" id="lockup" hidden></div>
+      <div id="copy"></div>
+    </div>
+    <div class="controls">
+      <button id="back">Back</button>
+      <button id="next" class="primary">Next</button>
+      <button id="replay">Replay</button>
+      <button id="speed" aria-pressed="false">0.5×</button>
+      <button id="reduced" aria-pressed="false">Reduced motion</button>
+    </div>
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <div>
+    <div class="panel">
+      <h2>The card on screen</h2>
+      <p class="tap" id="tap"></p>
+      <h2>Its markup</h2>
+      <pre id="markup"></pre>
+      <h2>Classes set on this tap, in order</h2>
+      <ol class="set" id="set"></ol>
+      <p class="delay" id="delay"></p>
+    </div>
+    <div class="panel">
+      <h2>The classes</h2>
+      <table>
+        <tr><th>Class</th><th>When</th><th>What it does</th></tr>
+        <tr><td><code>yig-in</code></td><td>the card's copy should arrive</td><td>Waits <code>--yig-delay</code>, then rises in, line by line.</td></tr>
+        <tr><td><code>yig-quick</code></td><td>the tap stayed in the same room</td><td>Rises right after the old copy clears.</td></tr>
+        <tr><td><code>yig-after-icon</code></td><td>a game's first card</td><td>Lines start one step after the icon pops.</td></tr>
+        <tr><td><code>yig-out</code></td><td>the old copy leaves</td><td>Lifts out; hide it once it has cleared. Copy still rising should just be hidden.</td></tr>
+        <tr><td><code>yig-back</code></td><td>Back</td><td>Mirrors the motion: copy comes down into place.</td></tr>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+// ---- the cards: one room each, except the two Wordle cards, which share one. Each line of `lines` is a designed line.
+const CARDS = [
+  { label: "Opener", room: "opener", wall: "#E7F1E1", lines: ["But that’s", "not all."] },
+  { label: "Wordle 1 of 2", room: "wordle", wall: "#C3E2C0", icon: "wordle", lockup: true, lines: ["You solved", "212 Wordles", "this year."] },
+  { label: "Wordle 2 of 2", room: "wordle", wall: "#C3E2C0", icon: "wordle", lines: ["Your best streak", "was 41 days."] },
+  { label: "Community: Spelling Bee", room: "spelling-bee", wall: "#FFFDEF", icon: "spelling-bee", community: true, lines: ["Together, players", "found 3 million", "pangrams."] },
+  { label: "Chapter 3", room: "chapter-3", wall: "#E1DBF5", floor: "#05CE7C", lines: ["There’s plenty more", "to celebrate, too."] },
+];
+const ICON_FILE = { wordle: "wordle-icon.svg", "spelling-bee": "spelling-bee-icon.svg" };
+const PAN_MS = 1650;   // a room that comes back: when the pan ends
+let speed = 1;
+
+// A time from yig-text-motion.css, in ms (the same helper as yig-integration.js); the stylesheet's own value if it is missing.
+function cssMs(name, fallback) {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const ms = v.endsWith("ms") ? parseFloat(v) : parseFloat(v) * 1000;
+  if (!Number.isFinite(ms)) { document.getElementById("cssnote").hidden = false; return fallback; }
+  return ms;
+}
+const clearMs = () => cssMs("--yig-clear", 340);
+
+// ---- the copy blocks: one .yig-text per card, one .yig-icon per game, all hidden until shown
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+function cardHtml(c, i) {
+  const lines = c.lines.map((l) => `  <span class="yig-mask"><span class="yig-line headline">${esc(l)}</span></span>`).join("\n");
+  return `<div class="yig-text blk${c.icon ? " after-icon-slot" : ""}" data-copy-frame="${i}" hidden>\n${lines}\n</div>`;
+}
+const iconHtml = (g) => `<div class="yig-icon blk" data-icon-game="${g}" hidden><span class="yig-pop"><img src="example/assets/icons/${ICON_FILE[g]}" alt=""></span></div>`;
+document.getElementById("copy").innerHTML = [...new Set(CARDS.map((c) => c.icon).filter(Boolean))].map(iconHtml).join("") + CARDS.map(cardHtml).join("");
+const name = (el) => el.classList.contains("yig-icon") ? `the ${el.dataset.iconGame} icon` : `${CARDS[el.dataset.copyFrame].label} copy`;
+
+// ---- the copy logic: showCopy, leave and enter mirror yig-integration.js line for line; `note` only records each class change for
+// the panel, and timers are divided by the speed so the 0.5x view stays in step. The decision of the wait in move() mirrors its move().
+let notes = [];
+const note = (el, what, classes) => notes.push({ el, who: name(el), what, classes,
+  target: el.classList.contains("yig-icon") ? `[data-icon-game="${el.dataset.iconGame}"]` : `[data-copy-frame="${el.dataset.copyFrame}"]` });
+
+function showCopy(n, { changed, delay, back = false }) {
+  const visible = [...document.querySelectorAll(".yig-text:not([hidden]), .yig-icon:not([hidden])")];
+  visible.filter((el) => changed || !el.classList.contains("yig-icon")).forEach((el) => leave(el, back));
+  const next = document.querySelector(`[data-copy-frame="${n}"]`);
+  const icon = CARDS[n].icon && document.querySelector(`[data-icon-game="${CARDS[n].icon}"]`);
+  const iconStays = !changed && icon && !icon.hidden;
+  if (iconStays) note(icon, "stays", []);
+  if (delay === null && changed) delay = clearMs();
+  if (icon && !iconStays) enter(icon, { delay, back });
+  if (next) enter(next, delay === null ? { quick: true, back } : { delay, afterIcon: !!icon && !iconStays, back });
+  return delay;
+}
+
+function leave(el, back = false) {
+  const settled = el.getAnimations({ subtree: true }).every((a) => a.playState === "finished");
+  if (settled) {
+    el.classList.toggle("yig-back", back);
+    el.classList.add("yig-out");
+    note(el, "leaves", [...(back ? ["yig-back"] : []), "yig-out"]);
+    setTimeout(() => { el.hidden = true; }, clearMs() / speed);
+  } else {
+    el.hidden = true;
+    note(el, "hidden at once (it was still rising)", []);
+  }
+}
+
+function enter(el, { quick = false, delay = null, afterIcon = false, back = false } = {}) {
+  el.classList.remove("yig-in", "yig-out");
+  el.classList.toggle("yig-quick", quick);
+  el.classList.toggle("yig-after-icon", afterIcon);
+  el.classList.toggle("yig-back", back);
+  if (delay === null) el.style.removeProperty("--yig-delay");
+  else el.style.setProperty("--yig-delay", `${delay}ms`);
+  el.hidden = false;
+  void el.offsetWidth;
+  el.classList.add("yig-in");
+  note(el, "arrives", [...(quick ? ["yig-quick"] : []), ...(afterIcon ? ["yig-after-icon"] : []), ...(back ? ["yig-back"] : []), "yig-in"]);
+}
+
+// ---- moves: the wait is decided as yig-integration.js decides it (a new room: the first-visit time, or the lockup's on a game's
+// first card; a room that comes back: the end of the pan; the same room: right after the old copy clears)
+let frame = 0, visited = new Set([CARDS[0].room]), copyFrom = {}, lockupTimer = 0, last = null;
+
+function move(step, replay = false) {
+  const target = frame + step;
+  if (target < 0 || target >= CARDS.length) return;
+  if (!replay) last = { from: frame, step, visited: new Set(visited), copyFrom: { ...copyFrom } };
+  const from = CARDS[frame], to = CARDS[target];
+  const roomChange = to.room !== from.room;
+  const now = performance.now();
+  const firstVisit = roomChange && step > 0 && !visited.has(to.room);
+  frame = target;
+  if (firstVisit) {
+    visited.add(to.room);
+    copyFrom[to.room] = now + (to.lockup && !to.community ? cssMs("--yig-lockup", 3200) : cssMs("--yig-first-visit", 2000));
+  }
+  const settleLeft = Math.max(0, (copyFrom[to.room] ?? 0) - now);
+  let delay;
+  if (!roomChange) delay = settleLeft > 0 ? settleLeft : null;
+  else if (firstVisit) delay = copyFrom[to.room] - now;
+  else delay = Math.max(PAN_MS, settleLeft);
+  if (roomChange) room(to, firstVisit && to.lockup);
+  notes = [];
+  const used = showCopy(target, { changed: roomChange || to.icon !== from.icon, delay, back: step < 0 });
+  panel(`${step > 0 ? "Next" : "Back"} to ${to.label}`, used);
+}
+
+// the stand-in room: its colours crossfade, and a game's first visit shows a stand-in lockup until the copy may arrive
+function room(card, lockup) {
+  const r = document.getElementById("room");
+  r.style.setProperty("--wall", card.wall);
+  r.style.setProperty("--floor", card.floor || "#FEA0C9");
+  const lk = document.getElementById("lockup");
+  clearTimeout(lockupTimer);
+  lk.hidden = !lockup;
+  if (lockup) { lk.textContent = "Lockup"; lockupTimer = setTimeout(() => { lk.hidden = true; }, cssMs("--yig-lockup", 3200) / speed); }
+}
+
+// Replay: put the card before the last tap back on screen, settled, and play the same tap again
+function replay() {
+  if (!last) return restart();
+  document.querySelectorAll(".yig-text, .yig-icon").forEach((el) => { el.hidden = true; el.className = el.className.replace(/\byig-(in|out|quick|after-icon|back)\b/g, "").trim(); });
+  frame = last.from; visited = new Set(last.visited); copyFrom = { ...last.copyFrom };
+  const c = CARDS[frame];
+  room(c, false);
+  settledOn(frame);
+  move(last.step, true);
+}
+function settledOn(n) {
+  const els = [document.querySelector(`[data-copy-frame="${n}"]`), CARDS[n].icon && document.querySelector(`[data-icon-game="${CARDS[n].icon}"]`)].filter(Boolean);
+  for (const el of els) { el.style.setProperty("--yig-delay", "0ms"); el.hidden = false; el.classList.add("yig-in"); el.getAnimations({ subtree: true }).forEach((a) => a.finish()); }
+}
+function restart() {
+  document.querySelectorAll(".yig-text, .yig-icon").forEach((el) => { el.hidden = true; el.classList.remove("yig-in", "yig-out", "yig-quick", "yig-after-icon", "yig-back"); });
+  frame = 0; visited = new Set([CARDS[0].room]); copyFrom = {}; last = null;
+  room(CARDS[0], false);
+  notes = [];
+  const used = showCopy(0, { changed: true, delay: 0 });
+  panel(`Open on ${CARDS[0].label}`, used);
+}
+
+// ---- the panel: the card's markup, the classes set on this tap, in order, and the --yig-delay used
+function panel(title, used) {
+  document.getElementById("tap").textContent = title;
+  const c = CARDS[frame];
+  document.getElementById("markup").textContent = (c.icon ? iconHtml(c.icon).replace(" hidden", "") + "\n" : "") + cardHtml(c, frame).replace(" hidden", "");
+  document.getElementById("set").innerHTML = notes.map((n, i) =>
+    `<li data-row="${i}" data-target='${n.target}' data-classes="${n.classes.join(" ")}">${esc(n.who)} ${esc(n.what)}${n.classes.length ? ": " + n.classes.map((k) => `<code>${k}</code>`).join(", then ") : ""}</li>`).join("");
+  const copyEl = document.querySelector(`[data-copy-frame="${frame}"]`);
+  document.getElementById("delay").innerHTML = copyEl.classList.contains("yig-quick")
+    ? "<code>--yig-delay</code>: not set; <code>yig-quick</code> waits for the old copy to clear"
+    : `<code>--yig-delay</code>: <code>${Math.round(used)}ms</code>`;
+  document.getElementById("cards").innerHTML = CARDS.map((k, i) => `<span class="${i === frame ? "now" : ""}">${esc(k.label)}</span>`).join("");
+  document.getElementById("back").disabled = frame === 0;
+  document.getElementById("next").disabled = frame === CARDS.length - 1;
+}
+
+// ---- 0.5x: every animation on the page plays at the chosen rate, and the timers above are divided by it
+(function rate() { for (const a of document.getAnimations()) if (a.playbackRate !== speed) a.playbackRate = speed; requestAnimationFrame(rate); })();
+function fit() { document.documentElement.style.setProperty("--k", Math.min(1, (innerHeight - 140) / 828).toFixed(3)); }
+addEventListener("resize", fit); fit();
+
+document.getElementById("next").onclick = () => move(1);
+document.getElementById("back").onclick = () => move(-1);
+document.getElementById("replay").onclick = replay;
+document.getElementById("speed").onclick = (e) => { speed = speed === 1 ? 0.5 : 1; e.currentTarget.setAttribute("aria-pressed", String(speed !== 1)); };
+document.getElementById("reduced").onclick = (e) => { const on = document.body.classList.toggle("reduced"); e.currentTarget.setAttribute("aria-pressed", String(on)); };
+addEventListener("keydown", (e) => { if (e.key === "ArrowRight") move(1); if (e.key === "ArrowLeft") move(-1); });
+restart();
+</script>
+</body>
+</html>

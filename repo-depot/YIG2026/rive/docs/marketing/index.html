@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Year in Games 2026 · preview</title>
+<link rel="icon" href="data:,">
+
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>:root { --paper: #F1F3EE; --surface: #FFFFFF; --ink: #1F1F1F; --muted: #5C6759; --line: #D3DACF; --ui: "NYT Franklin", "Helvetica Neue", Arial, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--paper); color: var(--ink); font: 500 13px/1.3 var(--ui); display: flex; flex-direction: column; overflow: hidden; }
+.bar { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.bar h1 { font: 700 15px/1.2 "NYT Karnak", Georgia, serif; margin: 0 6px 0 0; }
+.bar label { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); }
+.bar label[hidden] { display: none; }
+.bar select, .bar button { font: 500 13px var(--ui); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 4px 8px; cursor: pointer; }
+.bar select:hover, .bar button:hover { border-color: var(--ink); }
+.status { flex: none; padding: 5px 12px; font: 500 12px var(--ui); color: var(--muted); border-bottom: 1px solid var(--line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.main { flex: 1; min-height: 0; display: flex; }
+.area { flex: 1; min-width: 0; position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); place-items: start center; }
+.area.device { padding: 12px; }
+
+.area.device.shrunk { justify-items: start; }
+.frame { border: 0; display: block; background: #FFF; transform-origin: top center; }
+.area.device.shrunk .frame { transform-origin: top left; }
+.area.device .frame { box-shadow: 0 0 0 1px var(--line), 0 6px 24px rgba(0, 0, 0, .12); border-radius: 18px; }
+.area.window .frame { width: 100%; height: 100%; }
+.bar button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+#finesse { flex: none; width: 300px; border-left: 1px solid var(--line); background: var(--surface); overflow: auto; font-size: 12px; }
+#finesse[hidden], #fin-grip[hidden] { display: none; }
+
+#fin-grip { flex: none; width: 8px; margin-right: -5px; position: relative; z-index: 3; cursor: col-resize; touch-action: none; }
+#fin-grip::after { content: ""; position: absolute; top: 0; bottom: 0; left: 3px; width: 2px; background: transparent; }
+#fin-grip:hover::after, #fin-grip.dragging::after, #fin-grip:focus-visible::after { background: var(--ink); }
+#fin-grip:focus-visible { outline: none; }
+.fin-body > * { min-width: 0; }
+.fin-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--surface); z-index: 1; }
+.fin-head b { font: 700 13px var(--ui); flex: 1; }
+#finesse.folded .fin-body { display: none; }
+.fin-body { padding: 10px 12px 14px; display: grid; gap: 10px; }
+#finesse button, #finesse select { font: 500 12px var(--ui); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 4px 9px; cursor: pointer; }
+#finesse button:hover:not(:disabled), #finesse select:hover { border-color: var(--ink); }
+#finesse button:disabled { opacity: .4; cursor: default; }
+#finesse button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.fin-room { color: var(--muted); line-height: 1.35; }
+.fin-room b { color: var(--ink); }
+.fin-tc { display: flex; align-items: baseline; gap: 6px; }
+.fin-tc #fin-time { font: 700 34px/1 var(--ui); font-variant-numeric: tabular-nums; }
+.fin-tc small { color: var(--muted); }
+.fin-tc #fin-part { font: 700 13px var(--ui); align-self: center; }
+.fin-tc #fin-frame { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fin-track { position: relative; height: 26px; background: #EEF1EA; border-radius: 6px; overflow: hidden; }
+.fin-track .intro { position: absolute; top: 0; bottom: 0; left: 0; background: #DDE6D4; }
+.fin-track .tick { position: absolute; top: 0; bottom: 0; width: 2px; background: #C2570A; }
+.fin-track .tick.small { top: 60%; width: 1px; background: #2F6FB0; }
+.fin-track .head { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--ink); }
+.fin-scale { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-top: -6px; }
+.fin-ctl { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.fin-ctl .sp { margin-left: auto; display: flex; gap: 4px; }
+.fin-ctl label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.fin-list { color: var(--muted); line-height: 1.4; }
+.fin-list b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.fin-hist { color: #8A4B00; min-height: 1.2em; }
+.fin-note { margin: 0; color: var(--muted); line-height: 1.4; }
+
+.fin-sec ~ .fin-sec { border-top: 1px solid var(--line); padding-top: 8px; }
+.fin-sec > summary { font: 700 12px var(--ui); cursor: pointer; }
+.fin-sec[open] > summary { margin-bottom: 8px; }
+.fin-sec-body { display: grid; gap: 10px; }
+.fin-sig { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.fin-sig h3 { margin: 2px 0 0; font: 700 12px var(--ui); }
+.fin-seg { display: inline-flex; gap: 4px; }
+#fin-log { margin: 0; min-width: 0; max-width: 100%; height: 440px; min-height: 90px; resize: vertical; overflow: auto; background: #fff; border: 1px solid var(--line); padding: 4px 6px; font: 10.5px / 1.45 ui-monospace, Menlo, monospace; white-space: pre; }
+#fin-log .bad { color: #C0261B; font-weight: 600; }
+#fin-log .dim { color: var(--muted); }
+#seam-flash { position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #C2570A; opacity: 0; pointer-events: none; z-index: 5; }
+#seam-flash.small { background: #2F6FB0; }
+#seam-flash.on { opacity: 1; transition: none; }
+#seam-flash:not(.on) { transition: opacity .35s ease-out; }
+
+#pin-catch { position: absolute; inset: 0; z-index: 6; cursor: crosshair; }
+#pin-layer { position: absolute; inset: 0; z-index: 7; pointer-events: none; overflow: hidden; }
+.pin { position: absolute; width: 0; height: 0; }
+.pin .ring { position: absolute; left: -17px; top: -17px; width: 34px; height: 34px; border-radius: 50%; border: 3px solid #C2570A; box-shadow: 0 0 0 2px #FFF, inset 0 0 0 2px #FFF;
+  pointer-events: auto; cursor: pointer; }
+.pin .num { position: absolute; left: 10px; top: -38px; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 12px; border: 2px solid #FFF; background: #C2570A; color: #FFF;
+  font: 700 12px/20px var(--ui); text-align: center; pointer-events: auto; cursor: pointer; }
+#pin-edit { position: absolute; z-index: 8; width: 250px; display: grid; gap: 6px; padding: 8px; font-size: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 6px 20px rgba(0, 0, 0, .18); }
+#pin-edit[hidden], .pin[hidden], #pin-catch[hidden] { display: none; }
+#pin-edit small { color: var(--muted); line-height: 1.35; }
+#pin-edit textarea { font: 500 12px/1.35 var(--ui); color: var(--ink); width: 100%; resize: vertical; border: 1px solid var(--line); border-radius: 6px; padding: 5px 6px; }
+#pin-edit .row { display: flex; gap: 6px; }
+#pin-edit button { font: 500 12px var(--ui); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 4px 9px; cursor: pointer; }
+#pin-edit button:hover { border-color: var(--ink); }
+.fin-pins { display: grid; gap: 8px; }
+.pin-row { display: grid; gap: 3px; cursor: pointer; padding: 4px; margin: -4px; border-radius: 6px; }
+.pin-row:hover { background: #EEF1EA; }
+.pin-head { display: flex; align-items: center; gap: 6px; }
+.pin-text { padding-left: 28px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pin-text i { color: var(--muted); }
+.pin-head .n { flex: none; min-width: 22px; height: 22px; border-radius: 11px; background: #C2570A; color: #FFF; font: 700 11px/22px var(--ui); text-align: center; }
+.pin-head span { flex: 1; color: var(--muted); }
+.pin-head span b { color: var(--ink); }
+#finesse .pin-head button { padding: 0 7px; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Year in Games 2026 · full experience</h1>
+  <label>Flow <select id="flow"><option value="sub">Subscriber / registered</option><option value="anon">Anon</option></select></label>
+  <label id="player-wrap">Player <select id="player">
+    <option value="wordle-only">Wordle only (Chapter 2.5; both badge cards)</option>
+    <option value="midi-only">Midi only (all five community cards; event badges only)</option>
+    <option value="several-games">Several games (no 2.5; personal badges only)</option>
+    <option value="all-seven">All seven games (no badge cards)</option>
+    <option value="all-seven-short">All seven games (Chapter 2 short)</option>
+    <option value="connections-only">Connections only (Chapter 2.5; personal badges only)</option>
+    <option value="none">No qualifying game (gets the anonymous flow)</option>
+  </select></label>
+  <label id="top-wrap">Top game <select id="top">
+    <option value="">The player's first game</option>
+    <option value="wordle">Wordle</option><option value="connections">Connections</option><option value="strands">Strands</option>
+    <option value="spelling-bee">Spelling Bee</option><option value="mini">The Mini</option><option value="midi">The Midi</option>
+    <option value="crossword">The Crossword</option>
+  </select></label>
+  <label>Screen <select id="size">
+    <option value="window">Window</option>
+    <option value="375x667">iPhone SE · 375 × 667</option>
+    <option value="375x812">Phone · 375 × 812</option>
+    <option value="430x932">iPhone 15 Pro Max · 430 × 932</option>
+    <option value="820x1180">iPad portrait · 820 × 1180</option>
+    <option value="1440x900">Desktop · 1440 × 900</option>
+  </select></label>
+  <label>Jump to <select id="jump"></select></label>
+  <button id="restart">Restart</button>
+  <button id="rive-only" aria-pressed="false" title="H">Rive only</button>
+  <button id="finesse-toggle" aria-pressed="false" title="DevTools (F)">DevTools</button>
+</div>
+<div class="status" id="status">Loading…</div>
+<div class="main">
+<div class="area window" id="area"><iframe class="frame" id="frame" title="The experience"></iframe><div id="seam-flash"></div></div>
+<div id="fin-grip" hidden role="separator" aria-orientation="vertical" aria-label="DevTools width" tabindex="0" title="Drag to set the panel's width"></div>
+<aside id="finesse" hidden aria-label="DevTools">
+  <div class="fin-head"><b>DevTools</b><button id="fin-fold" title="Fold">–</button></div>
+  <div class="fin-body">
+    <details class="fin-sec" id="fin-room-sec" data-param="room">
+      <summary>Room</summary>
+      <div class="fin-sec-body">
+        <div class="fin-room" id="fin-room">Waiting for the stage…</div>
+        <div><button id="fin-replay">Replay room</button></div>
+        <div class="fin-tc"><span id="fin-part"></span><span id="fin-time">0.0</span><small>s</small><span id="fin-frame"></span></div>
+        <div class="fin-track" id="fin-track"></div>
+        <div class="fin-scale"><span>0</span><span id="fin-span"></span></div>
+        <div class="fin-ctl">
+          <button id="fin-back" title="One frame back (,)">◀|</button>
+          <button id="fin-play" title="Pause or play (Space)">⏸</button>
+          <button id="fin-fwd" title="One frame forward (.)">|▶</button>
+          <span class="sp"><button data-speed="1" aria-pressed="true">1×</button><button data-speed="0.5" aria-pressed="false">0.5×</button></span>
+        </div>
+        <div class="fin-hist" id="fin-hist"></div>
+        <div class="fin-list" id="fin-list"></div>
+      </div>
+    </details>
+    <div id="fin-local"></div>
+    <details class="fin-sec" id="fin-copy" data-param="timing" data-open>
+      <summary>Copy timing</summary>
+      <div class="fin-sig">
+        <div class="fin-seg" role="group" aria-label="Copy timing" id="fin-copy-mode">
+          <button data-copy="timer" aria-pressed="false">Timer</button><button data-copy="trigger" aria-pressed="true">copyReady trigger</button>
+        </div>
+        <div class="fin-ctl"><label>Runtime <select id="fin-runtime"><option value="2.27.3">2.27.3</option><option value="2.34.0">2.34.0</option></select></label></div>
+        <div class="fin-ctl"><label title="Every file's reducedMotion setting: still rooms, the copy at the usual times"><input type="checkbox" id="fin-rm"> Reduced motion</label></div>
+        <h3>Trigger log</h3>
+        <pre id="fin-log" aria-label="Trigger log"></pre>
+        <div class="fin-ctl"><button id="fin-log-copy">Copy log</button> <button id="fin-log-clear">Clear log</button></div>
+      </div>
+    </details>
+  </div>
+</aside>
+</div>
+
+<script>const q = new URLSearchParams(location.search);
+const $ = (id) => document.getElementById(id);
+const fields = ["flow", "player", "top", "size"];
+for (const f of fields) if (q.get(f) !== null) $(f).value = q.get(f);
+let riveOnly = q.has("rive-only");
+const RUNTIME = "2.34.0";
+const fin = { on: q.get("devtools") === "1" || q.get("finesse") === "1" || q.get("signal") === "1", speed: 1, timing: {}, key: "", zero: 0, first: true, visited: new Set(), lastTc: 0, paused: false,
+  fileTime: {}, lastClk: null, roomSet: {}, lastPos: null, lastSmall: undefined, comment: false, editing: 0, seek: null,
+  copy: q.get("copy") === "timer" ? "timer" : "trigger", runtime: q.get("runtime") === "2.27.3" ? "2.27.3" : RUNTIME,
+  rm: q.get("reducedMotion") === "1" };
+let local = false;
+const hooks = { tick() {}, keys() { return false; }, stopped() {}, panelOff() {}, timing() {}, beforeStart: async () => {} };
+
+function stageUrl(jump, goto) {
+  const p = new URLSearchParams({ flow: $("flow").value, player: $("player").value });
+  if ($("top").value) p.set("top", $("top").value);
+  if (goto) p.set("goto", goto);
+  else if (jump) p.set("jump", jump);
+  if (fin.on) p.set("finesse", "1");
+  if (local) p.set("local", "1");
+  if (riveOnly) p.set("rive-only", "");
+  if (fin.copy === "timer") p.set("copy", "timer");
+  if (fin.runtime !== RUNTIME) p.set("runtime", fin.runtime);
+  p.set("reducedMotion", fin.rm ? "1" : "0");
+  return `stage.html?${p}`;
+}
+function remember() {
+  const p = new URLSearchParams();
+  for (const f of fields) p.set(f, $(f).value);
+  if (fin.on) p.set("devtools", "1");
+  for (const s of document.querySelectorAll(".fin-sec[data-param]")) if (s.open !== s.hasAttribute("data-open")) p.set(s.dataset.param, s.open ? "1" : "0");
+  if (fin.copy === "timer") p.set("copy", "timer");
+  if (fin.runtime !== RUNTIME) p.set("runtime", fin.runtime);
+  if (fin.rm) p.set("reducedMotion", "1");
+  if (q.get("notes-folder")) p.set("notes-folder", q.get("notes-folder"));
+  history.replaceState(null, "", `?${p}${riveOnly ? "&rive-only" : ""}`);
+}
+function layout() {
+  const area = $("area"), frame = $("frame");
+  const size = $("size").value;
+  const subs = $("flow").value === "sub";
+  $("player-wrap").hidden = !subs;
+  $("top-wrap").hidden = !subs;
+  if (size === "window") {
+    area.className = "area window";
+    frame.style.width = frame.style.height = frame.style.transform = "";
+    return;
+  }
+  const [w, h] = size.split("x").map(Number);
+  area.className = "area device";
+  frame.style.width = `${w}px`;
+  frame.style.height = `${h}px`;
+  const scale = Math.min(1, (area.clientWidth - 24) / w, (area.clientHeight - 24) / h);
+  area.classList.toggle("shrunk", scale < 1);
+  frame.style.transform = `scale(${scale})`;
+}
+new ResizeObserver(() => layout()).observe($("area"));
+let started = false;
+function load(jump = 0, goto = "") {
+  started = true;
+  fin.key = ""; fin.visited.clear(); fin.paused = false; fin.seams = 0;
+  freshClocks();
+  fin.loading = true;
+  if (fin.on) loadTiming();
+  remember();
+  layout();
+  $("frame").src = stageUrl(jump, goto);
+}
+const here = () => { const x = $("frame").contentWindow?.yigExperience; const at = x ? x.state().frame : 0; return at > 1 ? at : 0; };
+$("frame").addEventListener("load", () => { fin.key = ""; fin.visited.clear(); fin.loading = false; freshClocks(); });
+function freshClocks() { fin.fileTime = {}; fin.lastClk = null; fin.roomSet = {}; fin.lastPos = null; fin.lastSmall = undefined; }
+for (const f of fields) $(f).addEventListener("change", () => (f === "size" ? (remember(), layout()) : load()));
+$("restart").addEventListener("click", () => load());
+$("jump").addEventListener("change", () => {
+  const entry = SCENES[Number($("jump").value)];
+  $("jump").selectedIndex = 0;
+  if (!entry) return;
+  if (entry.flow) $("flow").value = entry.flow;
+  if (entry.top) $("top").value = entry.top;
+  if (entry.game && $("flow").value === "sub" && !QUALIFYING[$("player").value].includes(entry.game)) $("player").value = entry.player || "all-seven";
+  if (entry.player && !entry.game) $("player").value = entry.player;
+  load(0, entry.goto);
+});
+addEventListener("resize", layout);
+addEventListener("keydown", (e) => {
+  const x = $("frame").contentWindow?.yigExperience;
+  if (!x || e.target.closest?.("input, textarea")) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); x.onTap(); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); x.onBack(); }
+  if ((e.key === "h" || e.key === "H") && !e.metaKey && !e.ctrlKey && !e.altKey && !e.target.closest?.("select, input, textarea")) x.setRiveOnly(!x.riveOnly());
+});
+$("rive-only").addEventListener("click", () => { $("frame").contentWindow?.yigExperience?.setRiveOnly(!riveOnly); $("rive-only").blur(); });
+setInterval(() => {
+  const x = $("frame").contentWindow?.yigExperience;
+  if (!x?.riveOnly || x.riveOnly() === riveOnly) return;
+  riveOnly = x.riveOnly();
+  $("rive-only").setAttribute("aria-pressed", String(riveOnly));
+  remember();
+}, 200);
+$("rive-only").setAttribute("aria-pressed", String(riveOnly));
+
+const GAMES = [["wordle", "Wordle"], ["connections", "Connections"], ["spelling-bee", "Spelling Bee"], ["mini", "The Mini"], ["midi", "The Midi"], ["crossword", "The Crossword"], ["strands", "Strands"]];
+const QUALIFYING = { "wordle-only": ["wordle"], "midi-only": ["midi", "crossword"], "connections-only": ["connections"], "several-games": ["wordle", "spelling-bee", "mini", "midi", "crossword", "strands"], "all-seven": GAMES.map((g) => g[0]), "all-seven-short": GAMES.map((g) => g[0]), "none": [] };
+const SCENES = [
+  { group: "Start (File 1)", label: "Loading", goto: "1:loading" },
+  { group: "Start (File 1)", label: "Start", goto: "1:start" },
+  { group: "Start (File 1)", label: "Ad 1", goto: "1:ad" },
+  ...[["chapter-1", "Chapter 1 opener"], ["chapter-1-2", "Total solves"], ["chapter-1-3", "First puzzle"], ["chapter-1-4", "Longest streak"], ["chapter-1-5", "Wordle Bot"]]
+    .map(([s, label]) => ({ group: "Chapter 1 (File 1)", label, goto: `1:${s}` })),
+  { group: "Chapter 1 (File 1)", label: "Ad 2", goto: "1:ad:2" },
+  { group: "Chapter 2 (File 2)", label: "Chapter 2 opener", goto: "2:chapter-2", flow: "sub" },
+  ...GAMES.map(([g, name]) => ({ group: "Chapter 2 (File 2)", label: `${name} stats`, goto: `2:${g}`, flow: "sub", game: g })),
+  { group: "Chapter 2 (File 2)", label: "Ad 3 (anon)", goto: "2:to-chapter-3", flow: "anon" },
+  { group: "Chapter 2.5 (File 2)", label: "Chapter 2.5 opener", goto: "2:chapter-2-community-intro", flow: "sub", player: "wordle-only" },
+  ...[["wordle", "Wordle"], ["connections", "Connections"], ["spelling-bee", "Spelling Bee"], ["mini", "The Mini"], ["strands", "Strands"]]
+    .map(([g, name]) => ({ group: "Chapter 2.5 (File 2)", label: `${name} community card`, goto: `2:${g}:community`, flow: "sub", player: "midi-only" })),
+  { group: "Chapter 3 (File 3)", label: "Chapter 3 opener", goto: "3:chapter-3" },
+  { group: "Chapter 3 (File 3)", label: "New ways to play", goto: "3:chapter-3-2", flow: "sub" },
+  { group: "Chapter 3 (File 3)", label: "Personal badges", goto: "3:chapter-3-personal-badges", flow: "sub", player: "wordle-only" },
+  { group: "Chapter 3 (File 3)", label: "Event badges", goto: "3:chapter-3-event-badges", flow: "sub", player: "wordle-only" },
+  { group: "Chapter 3 (File 3)", label: "Anon: Connections hit 1000", goto: "3:chapter-3-event-badges", flow: "anon" },
+  { group: "Chapter 3 (File 3)", label: "Anon: Wordle turned 5", goto: "3:chapter-3-event-badges:2", flow: "anon" },
+  { group: "Chapter 4 (File 3)", label: "Chapter 4 opener", goto: "3:chapter-4", flow: "sub" },
+  ...GAMES.map(([g, name]) => ({ group: "Chapter 4 (File 3)", label: `Top game: ${name}`, goto: "3:chapter-4-top-game", flow: "sub", top: g })),
+  { group: "Chapter 4 (File 3)", label: "Editor video", goto: "3:chapter-4-editor-video", flow: "sub" },
+  { group: "End (File 3)", label: "End", goto: "3:end" },
+  { group: "End (File 3)", label: "Share", goto: "3:share", flow: "sub" },
+];
+{
+  const groups = new Map();
+  let html = '<option value="">a scene…</option>';
+  SCENES.forEach((s, i) => { if (!groups.has(s.group)) groups.set(s.group, []); groups.get(s.group).push(`<option value="${i}">${s.label} · ${s.goto.split(":")[1]}</option>`); });
+  for (const [g, opts] of groups) html += `<optgroup label="${g}">${opts.join("")}</optgroup>`;
+  $("jump").innerHTML = html;
+}
+
+setInterval(() => {
+  const x = $("frame").contentWindow?.yigExperience;
+  if (!x) return;
+  const s = x.state();
+  const k = x.cards[s.frame];
+  const fw = $("frame").contentWindow;
+  $("status").textContent = `Card ${s.frame + 1} of ${x.cards.length} · File ${s.shown} · scene "${s.scenes[s.shown - 1] ?? "…"}"`
+    + `${k.community ? " · community card" : ""} · viewport ${fw.innerWidth} × ${fw.innerHeight}`
+    + ` · ${fw.innerWidth >= 1025 ? "desktop: arrows" : "tap zones"} · ${x.flow === "anon" ? "anon" : "subscriber"}, top game ${x.top}`;
+}, 250);
+
+function loadTiming() {
+  fetch("rooms.json", { cache: "no-store" }).then((r) => r.json()).then((t) => { fin.timing = t; }).catch(() => {});
+  hooks.timing();
+}
+const FIN_W = { min: 260, max: 560, key: "yig-devtools-width" };
+function setFinWidth(w, save = false) {
+  const px = Math.round(Math.min(FIN_W.max, Math.max(FIN_W.min, w)));
+  $("finesse").style.width = `${px}px`;
+  $("fin-grip").setAttribute("aria-valuenow", String(px));
+  if (save) try { localStorage.setItem(FIN_W.key, String(px)); } catch { /* not kept */ }
+}
+try { const saved = Number(localStorage.getItem(FIN_W.key)); if (saved) setFinWidth(saved); } catch { /* the default */ }
+{
+  const grip = $("fin-grip");
+  const widthAt = (x) => document.querySelector(".main").getBoundingClientRect().right - x;
+  grip.addEventListener("pointerdown", (e) => { e.preventDefault(); grip.setPointerCapture(e.pointerId); grip.classList.add("dragging"); });
+  grip.addEventListener("pointermove", (e) => { if (grip.hasPointerCapture(e.pointerId)) setFinWidth(widthAt(e.clientX)); });
+  const end = (e) => { if (!grip.hasPointerCapture(e.pointerId)) return; grip.releasePointerCapture(e.pointerId); grip.classList.remove("dragging"); setFinWidth(widthAt(e.clientX), true); };
+  grip.addEventListener("pointerup", end);
+  grip.addEventListener("pointercancel", end);
+  grip.addEventListener("keydown", (e) => {
+    const step = e.shiftKey ? 50 : 10, now = $("finesse").getBoundingClientRect().width;
+    if (e.key === "ArrowLeft") { e.preventDefault(); e.stopPropagation(); setFinWidth(now + step, true); }
+    if (e.key === "ArrowRight") { e.preventDefault(); e.stopPropagation(); setFinWidth(now - step, true); }
+  });
+  grip.setAttribute("aria-valuemin", String(FIN_W.min));
+  grip.setAttribute("aria-valuemax", String(FIN_W.max));
+}
+function showFinesse() {
+  $("fin-grip").hidden = !fin.on;
+  $("finesse").hidden = !fin.on;
+  $("finesse-toggle").setAttribute("aria-pressed", String(fin.on));
+}
+function setFinesse(on) {
+  fin.on = on;
+  if (!on) hooks.panelOff();
+  showFinesse();
+  load(here());
+}
+$("finesse-toggle").addEventListener("click", () => setFinesse(!fin.on));
+
+const sigLog = [];
+const two = (n, w = 2) => String(n).padStart(w, "0");
+function sigCols(e) {
+  const d = new Date(e.time);
+  const t = `${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())}`;
+  if (e.note) return [t, e.note];
+  return [t, `F${e.file}`, e.scene ?? "?", e.waitKey ?? "", e.since === null ? "" : `${(e.since / 1000).toFixed(2)} s`, e.how];
+}
+function sigLines(list) {
+  const rows = list.map(sigCols), w = [];
+  for (const r of rows) if (r.length > 2) r.forEach((c, i) => { w[i] = Math.max(w[i] ?? 0, c.length); });
+  return rows.map((r) => (r.length === 2 ? r.join("  ") : r.map((c, i) => (i === r.length - 1 ? c : i === 4 ? c.padStart(w[i]) : c.padEnd(w[i]))).join("  ")));
+}
+const sigLine = (e) => sigLines([e])[0];
+function drawSigLog() {
+  const box = $("fin-log"), lines = sigLines(sigLog);
+  box.innerHTML = sigLog.map((e, i) => `<div class="${e.red ? "bad" : e.fire && /^(ignored|cancelled)$/.test(e.how) ? "dim" : ""}">${lines[i].replace(/&/g, "&amp;").replace(/</g, "&lt;")}</div>`).join("");
+  box.scrollTop = box.scrollHeight;
+}
+addEventListener("message", (m) => {
+  if (m.data?.type !== "yig-copy-log" || m.source !== $("frame").contentWindow) return;
+  sigLog.push(m.data.ev);
+  drawSigLog();
+});
+function section(el) {
+  const v = q.get(el.dataset.param);
+  el.open = el.id === "fin-copy" && q.get("signal") === "1" ? true : v === "1" ? true : v === "0" ? false : el.hasAttribute("data-open");
+  el.addEventListener("toggle", remember);
+}
+for (const s of document.querySelectorAll(".fin-sec[data-param]")) section(s);
+function showCopyMode() {
+  for (const b of document.querySelectorAll("#fin-copy-mode [data-copy]")) b.setAttribute("aria-pressed", String(b.dataset.copy === fin.copy));
+}
+for (const b of document.querySelectorAll("#fin-copy-mode [data-copy]")) {
+  b.addEventListener("click", () => {
+    if (fin.copy === b.dataset.copy) return;
+    fin.copy = b.dataset.copy;
+    showCopyMode();
+    load(here());
+  });
+}
+showCopyMode();
+$("fin-runtime").value = fin.runtime;
+$("fin-runtime").addEventListener("change", () => { fin.runtime = $("fin-runtime").value; load(here()); });
+$("fin-rm").checked = fin.rm;
+$("fin-rm").addEventListener("change", () => { fin.rm = $("fin-rm").checked; load(here()); });
+$("fin-log-clear").addEventListener("click", () => { sigLog.length = 0; drawSigLog(); });
+$("fin-log-copy").addEventListener("click", () => navigator.clipboard?.writeText(sigLines(sigLog).join("\n")));
+let lacking = new Set();
+$("frame").addEventListener("load", () => { lacking = new Set(); });
+setInterval(() => {
+  const have = $("frame").contentWindow?.yigExperience?.signalFiles?.() ?? [];
+  have.forEach((v, i) => {
+    if (v !== false || lacking.has(i)) return;
+    lacking.add(i);
+    sigLog.push({ note: `File ${i + 1} has no copyReady trigger.`, time: Date.now(), red: true });
+    drawSigLog();
+  });
+}, 1000);
+$("fin-fold").addEventListener("click", () => {
+  const folded = $("finesse").classList.toggle("folded");
+  $("fin-fold").textContent = folded ? "+" : "–";
+});
+
+const clockOf = () => $("frame").contentWindow?.__yigClock;
+function setPaused(p) {
+  fin.paused = p;
+  clockOf()?.setPaused(p);
+  $("fin-play").textContent = p ? "▶" : "⏸";
+}
+$("fin-play").addEventListener("click", () => setPaused(!fin.paused));
+$("fin-back").addEventListener("click", () => { setPaused(true); clockOf()?.stepBack(); });
+$("fin-fwd").addEventListener("click", () => { setPaused(true); clockOf()?.stepForward(); });
+for (const b of document.querySelectorAll("#finesse [data-speed]")) {
+  b.addEventListener("click", () => {
+    fin.speed = Number(b.dataset.speed);
+    clockOf()?.setSpeed(fin.speed);
+    for (const o of document.querySelectorAll("#finesse [data-speed]")) o.setAttribute("aria-pressed", String(o === b));
+  });
+}
+$("fin-replay").addEventListener("click", () => {
+  const x = $("frame").contentWindow?.yigExperience;
+  if (!x) return;
+  const cur = x.cards[x.state().frame];
+  const first = x.cards.findIndex((c) => c.file === cur.file && c.scene === cur.scene);
+  load(first > 1 ? first : 0);
+});
+function finesseKeys(e) {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.target.closest?.("select, input, textarea")) return;
+  if (e.key === "f" || e.key === "F") { e.preventDefault(); setFinesse(!fin.on); return; }
+  if (hooks.keys(e)) return;
+  if (!fin.on) return;
+  if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); $("fin-play").click(); }
+  if (e.key === ",") $("fin-back").click();
+  if (e.key === ".") $("fin-fwd").click();
+}
+addEventListener("keydown", finesseKeys);
+$("frame").addEventListener("load", () => { try { $("frame").contentWindow.addEventListener("keydown", finesseKeys); } catch { /* not ours */ } });
+
+function seamTimes(t, upto) {
+  const out = { loop: [], small: [] };
+  if (t.loop) {
+    const base = t.intro ?? 0, first = t.intro != null ? 0 : 1;
+    for (let k = first; k < 80 && base + k * t.loop <= upto + t.loop * 1.5; k++) out.loop.push(base + k * t.loop);
+  }
+  if (t.small) for (let k = 0; k < 80 && t.smallStart + k * t.small <= upto + t.small * 1.5; k++) out.small.push(t.smallStart + k * t.small);
+  return out;
+}
+let flashTimer = 0;
+function flash(kind) {
+  if (kind === "loop") fin.seams = (fin.seams ?? 0) + 1;
+  const el = $("seam-flash");
+  el.className = `${kind === "small" ? "small " : ""}on`;
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => el.classList.remove("on"), 120);
+}
+const fmt1 = (v) => v.toFixed(1);
+function loopPos(t, tc) {
+  return fin.first && t?.loop ? roomPos(t, tc) : null;
+}
+function roomPos(t, el) {
+  const intro = t.intro ?? 0;
+  if (el < intro) return { part: "intro", at: +el.toFixed(3), of: intro };
+  const into = el - intro;
+  return { part: "loop", at: +(into % t.loop).toFixed(3), of: +t.loop.toFixed(3), pass: Math.floor(into / t.loop) + 1 };
+}
+function panelTick() {
+  requestAnimationFrame(panelTick);
+  if (!fin.on || fin.loading) return;
+  const fw = $("frame").contentWindow, x = fw?.yigExperience, clk = fw?.__yigClock;
+  if (!x || !clk) return;
+  if (clk.speed !== fin.speed) clk.setSpeed(fin.speed);
+  if (clk.stopped) hooks.stopped(clk);
+  if (clk.paused !== fin.paused) clk.setPaused(fin.paused);
+  const s = x.state();
+  const scene = s.scenes[s.shown - 1] ?? "";
+  const key = `${s.shown}:${scene}`;
+  if (fin.lastClk !== null && clk.time > fin.lastClk) fin.fileTime[s.shown] = (fin.fileTime[s.shown] ?? 0) + clk.time - fin.lastClk;
+  fin.lastClk = clk.time;
+  if (key !== fin.key) {
+    fin.key = key; fin.zero = clk.time; fin.first = !fin.visited.has(key); fin.visited.add(key); fin.lastTc = 0; fin.lastPos = null; fin.lastSmall = undefined; fin.seams = 0;
+    if (fin.first) fin.roomSet[key] = fin.fileTime[s.shown] ?? 0;
+  }
+  const tc = Math.max(0, (clk.shownTime() - fin.zero) / 1000);
+  const t = fin.timing[key] ?? {};
+  const room = !!t.loop;
+  const behindMs = clk.time - clk.shownTime();
+  const since = fin.first ? tc : fin.roomSet[key] === undefined ? null : Math.max(0, ((fin.fileTime[s.shown] ?? 0) - behindMs - fin.roomSet[key]) / 1000);
+  const pos = !room || since === null ? null : fin.first ? loopPos(t, tc) : roomPos(t, since);
+  const small = room && t.small && since !== null ? (since < t.smallStart ? null : (since - t.smallStart) % t.small) : undefined;
+  if (tc > fin.lastTc && pos && fin.lastPos) {
+    if ((fin.lastPos.part === "intro" && pos.part === "loop") || (pos.part === "loop" && fin.lastPos.part === "loop" && pos.at < fin.lastPos.at)) flash("loop");
+    else if (typeof small === "number" && (fin.lastSmall === null || (typeof fin.lastSmall === "number" && small < fin.lastSmall))) flash("small");
+  }
+  fin.lastTc = tc; fin.lastPos = pos; fin.lastSmall = small;
+
+  $("fin-room").innerHTML = `<b>File ${s.shown} · ${scene}</b>${t.room ? ` · ${t.room}` : ""}<br>`
+    + (!room ? "An empty picture: no intro and no loop." : fin.first ? "First visit: the intro plays, then the loop."
+      : since === null ? "Back again; this room's start was not seen here, so its loop frame is unknown."
+      : "Back again: the room was already built.");
+  $("fin-replay").disabled = !room;
+  if (pos) {
+    const N = Math.round(pos.of * 60);
+    $("fin-part").textContent = pos.part === "intro" ? "Intro" : "Loop";
+    $("fin-time").textContent = pos.at.toFixed(2);
+    $("fin-frame").textContent = `frame ${Math.round(pos.at * 60) % N} of ${N}`;
+  } else {
+    $("fin-part").textContent = "";
+    $("fin-time").textContent = fmt1(tc);
+    $("fin-frame").textContent = room ? "loop frame unknown" : `frame ${Math.round(tc * 60)}`;
+  }
+
+  const intro = t.intro ?? 0;
+  const span = room ? intro + t.loop : 10;
+  const sig = `${key}|${span}|${fin.first}`;
+  const track = $("fin-track");
+  if (track.dataset.sig !== sig) {
+    track.dataset.sig = sig;
+    const pct = (v) => `${(100 * v) / span}%`;
+    const smallTicks = room && fin.first && t.small ? seamTimes(t, span).small.filter((v) => v < span) : [];
+    track.innerHTML = (intro ? `<div class="intro" style="width:${pct(intro)}"></div>` : "")
+      + (room ? `<div class="tick" style="left:${pct(intro)}"></div>` : "")
+      + smallTicks.map((v) => `<div class="tick small" style="left:${pct(v)}"></div>`).join("")
+      + '<div class="head" id="fin-head"></div>';
+    $("fin-span").textContent = `${fmt1(span)} s`;
+  }
+  const head = $("fin-head");
+  if (head) {
+    head.hidden = room && !pos;
+    const at = pos ? (pos.part === "intro" ? pos.at : intro + pos.at) : tc;
+    head.style.left = `${Math.min(100, (100 * at) / span)}%`;
+  }
+
+  const behind = clk.stepsBehind();
+  $("fin-hist").textContent = behind > 0 ? `${behind} frames behind live (${fmt1(behind / 60)} s); ${clk.available()} frames of history left.` : fin.paused ? "Paused." : "";
+  const sN = t.small ? Math.round(t.small * 60) : 0;
+  $("fin-list").innerHTML = !room ? "" :
+    (intro ? `Intro ends at <b>${fmt1(intro)} s</b>.` : "")
+    + (small === null ? `<br>Small loops: holding until the pan ends (${fmt1(t.smallStart)} s).`
+      : typeof small === "number" ? `<br>Small loops: frame <b>${Math.round(small * 60) % sN}</b> of ${sN} (${small.toFixed(2)} s).` : "");
+  hooks.tick(key, tc, clk);
+}
+requestAnimationFrame(panelTick);
+showFinesse();
+
+async function probe() {
+  try {
+    const r = await fetch("review-server", { cache: "no-store" });
+    return r.ok && (await r.json()).server === "yig-review";
+  } catch { return false; }
+}
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.append(s);
+  });
+}
+probe().then(async (yes) => {
+  local = yes;
+  if (local) await loadScript("experience-local.js").then(() => hooks.beforeStart()).catch(() => {});
+}).finally(() => { if (!started) load(0, q.get("goto") || ""); });
+</script>
+</body>
+</html>
