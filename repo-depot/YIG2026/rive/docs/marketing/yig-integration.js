@@ -16,6 +16,8 @@ const GAME_ORDER = ["wordle", "connections", "spelling-bee", "mini", "midi", "cr
 const COMMUNITY_GAMES = ["wordle", "connections", "spelling-bee", "mini", "strands"];
 const REVEAL_FADE_MS = 1450;
 const PAN_MS = 1650;
+const PAN_END_MS = 1550;
+const NO_PAN_MS = 100;
 
 let stage = null;
 let files = [];
@@ -28,9 +30,9 @@ let firstVisits = {};
 let pan = { dir: 0, endsAt: 0 };
 let heldTimer = 0;
 let holdToken = 0;
-let swapTimer = 0;
-let hopTimer = 0;
 let hopRun = null;
+let hopDone = null;
+let swapToken = 0;
 let seenAds = new Set();
 let signalMode = true;
 let reducedMotion = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -56,6 +58,9 @@ function start(el, list) {
   copyFrom = {};
   firstVisits = {};
   pan = { dir: 0, endsAt: 0 };
+  hopRun = null;
+  hopDone = null;
+  swapToken++;
   files = FILES.map(() => null);
   load(0);
   showCopy(0, { changed: true, delay: 0 });
@@ -89,8 +94,10 @@ function load(i) {
           const p = f.rive.viewModelInstance.boolean("isPanning");
           if (p) { f.panning = p; p.on(() => onPan(i)); }
         } catch { /* not declared */ }
-        requestAnimationFrame(() => requestAnimationFrame(() => { if (i !== shown) f.rive.pause(); }));
-        if (i + 1 < FILES.length && !files[i + 1]) load(i + 1);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (i !== shown) f.rive.pause();
+          if (i + 1 < FILES.length && !files[i + 1]) load(i + 1);
+        }));
         resolve();
       },
     });
@@ -117,8 +124,45 @@ function setScene(i, scene, step, community, reveal) {
   vm.enum("direction").value = step < 0 ? "back" : "forward";
   if (FILES[i].lockup) vm.boolean("lockup").value = !community;
   if (reveal !== undefined && vm.boolean("reveal")) vm.boolean("reveal").value = !!reveal;
-  if (vm.enum("scene").value !== scene) files[i].setAt = performance.now();
+  if (vm.enum("scene").value !== scene) {
+    files[i].setAt = performance.now();
+    files[i].panSeen = false;
+  }
   vm.enum("scene").value = scene;
+}
+
+function panRunning(i) {
+  const f = files[i];
+  if (!f?.loaded) return false;
+  const since = performance.now() - (f.setAt ?? -1e9);
+  if (!f.panning) return since < PAN_END_MS;
+  return f.panning.value || (!f.panSeen && since < NO_PAN_MS);
+}
+
+function afterPan(i, cb, minMs = 0) {
+  const f = files[i];
+  let done = false;
+  const check = () => {
+    if (done) return;
+    if (panRunning(i)) return;
+    const since = performance.now() - (f.setAt ?? -1e9);
+    if (since < minMs) { setTimeout(check, minMs - since); return; }
+    done = true;
+    f.panWaiters = (f.panWaiters || []).filter((w) => w !== check);
+    cb();
+  };
+  (f.panWaiters ||= []).push(check);
+  const since = performance.now() - (f.setAt ?? -1e9);
+  if (since < NO_PAN_MS) setTimeout(check, NO_PAN_MS - since + 1);
+  if (!f.panning && since < PAN_END_MS) setTimeout(check, PAN_END_MS - since + 1);
+  check();
+}
+
+function onAdClosed() {
+  const c = cards[frame];
+  if (!c?.ad) return;
+  const token = ++holdToken;
+  afterPan(c.file - 1, () => { if (token === holdToken && cards[frame] === c) move(+1); });
 }
 
 function show(i) {
@@ -167,14 +211,21 @@ function move(step) {
     heldTimer = setTimeout(() => move(step), pan.endsAt - now);
     return;
   }
+  if (step > 0 && hopRun) {
+    hopDone.then(() => { if (token === holdToken) move(step); });
+    return;
+  }
+  if (step > 0 && to.file !== from.file && panRunning(from.file - 1)) {
+    afterPan(from.file - 1, () => { if (token === holdToken) move(step); });
+    return;
+  }
   const fi = to.file - 1;
   if (step > 0 && !files[fi]?.loaded) {
     if (!files[fi]) load(fi);
     files[fi].ready.then(() => { if (token === holdToken) move(step); });
     return;
   }
-  if (roomChange) clearTimeout(swapTimer);
-  if (sceneChange && hopRun) { clearTimeout(hopTimer); hopRun(); }
+  if (roomChange) swapToken++;
   frame = target;
   if (to.ad) seenAds.add(target);
   const fading = !roomChange && revealChanges(to);
@@ -183,7 +234,7 @@ function move(step) {
   const key = `${to.file}:${room}`;
   const firstVisit = roomChange && step > 0 && !visited.has(key) && !FILES[fi].noIntro.includes(room);
   if (roomChange) {
-    pan = { dir: step, endsAt: now + PAN_MS * legs };
+    pan = { dir: step, endsAt: now + (legs - 1) * PAN_END_MS + PAN_MS };
     if (to.file === from.file) {
       setScene(fi, to.scene, step, !!to.community, to.reveal);
     } else if (step > 0) {
@@ -192,18 +243,25 @@ function move(step) {
         takeOver();
       } else {
         setScene(from.file - 1, FILES[from.file - 1].ends, step, false);
+        let started;
+        hopDone = new Promise((resolve) => { started = resolve; });
         hopRun = takeOver;
-        hopTimer = setTimeout(takeOver, PAN_MS);
+        afterPan(from.file - 1, () => { takeOver(); pan.endsAt = performance.now() + PAN_MS; started(); }, PAN_END_MS);
       }
     } else {
       setScene(from.file - 1, FILES[from.file - 1].opens, step, false);
-      swapTimer = setTimeout(() => { show(fi); if (legs === 2) setScene(fi, to.scene, step, !!to.community, to.reveal); }, PAN_MS);
+      const mine = ++swapToken;
+      afterPan(from.file - 1, () => {
+        if (mine !== swapToken) return;
+        show(fi);
+        if (legs === 2) { setScene(fi, to.scene, step, !!to.community, to.reveal); pan.endsAt = performance.now() + PAN_MS; }
+      }, PAN_END_MS);
     }
   }
   if (!roomChange && sceneChange) setScene(fi, to.scene, step, !!to.community, to.reveal);
   if (firstVisit) {
     visited.add(key);
-    copyFrom[key] = now + (legs - 1) * PAN_MS + firstVisitCopyMs(to);
+    copyFrom[key] = now + (legs - 1) * PAN_END_MS + firstVisitCopyMs(to);
     firstVisits[key] = { setAt: now, waitKey: legs === 2 ? "crossing_to_new_room" : lockupShows(to) ? "game_first_card" : "first_visit" };
   }
   const iconChange = to.icon !== from.icon;
@@ -211,7 +269,7 @@ function move(step) {
   let delay;
   if (!roomChange) delay = fading ? Math.max(settleLeft, REVEAL_FADE_MS) : settleLeft > 0 ? settleLeft : null;
   else if (firstVisit) delay = copyFrom[key] - now;
-  else delay = Math.max(PAN_MS * legs, settleLeft);
+  else delay = Math.max((legs - 1) * PAN_END_MS + PAN_MS, settleLeft);
   const onFirst = !firstVisit && settleLeft > 0 && delay === settleLeft && !!firstVisits[key];
   const waitKey = onFirst ? firstVisits[key].waitKey
     : firstVisit ? firstVisits[key].waitKey
@@ -315,10 +373,14 @@ function onCopyLog(fn) {
 
 function onPan(i) {
   const f = files[i];
-  if (!panFn || !f?.panning) return;
-  const since = f.setAt === undefined ? null : performance.now() - f.setAt;
-  panFn({ time: Date.now(), name: "isPanning", file: i + 1, scene: f.rive.viewModelInstance.enum("scene").value, value: !!f.panning.value,
-    since, frame: since === null ? null : Math.round(since * 60 / 1000) });
+  if (!f?.panning) return;
+  if (f.panning.value) f.panSeen = true;
+  if (panFn) {
+    const since = f.setAt === undefined ? null : performance.now() - f.setAt;
+    panFn({ time: Date.now(), name: "isPanning", file: i + 1, scene: f.rive.viewModelInstance.enum("scene").value, value: !!f.panning.value,
+      since, frame: since === null ? null : Math.round(since * 60 / 1000) });
+  }
+  [...(f.panWaiters || [])].forEach((w) => w());
 }
 
 function onPanLog(fn) {
@@ -373,4 +435,4 @@ function resize() {
 const state = () => ({ frame, shown: shown + 1, card: cards[frame], scenes: files.map((f) => f?.loaded ? f.rive.viewModelInstance.enum("scene").value : null),
   panning: files.map((f) => (f?.panning ? !!f.panning.value : null)) });
 
-export { start, onTap, onBack, ready, resize, state, setCopySignal, setReducedMotion, onCopyLog, onPanLog, signalFiles, FILES, GAME_ORDER, COMMUNITY_GAMES };
+export { start, onTap, onBack, onAdClosed, ready, resize, state, setCopySignal, setReducedMotion, onCopyLog, onPanLog, signalFiles, FILES, GAME_ORDER, COMMUNITY_GAMES };

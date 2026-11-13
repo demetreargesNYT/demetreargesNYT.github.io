@@ -278,7 +278,12 @@ ready(1).then(async () => {
   if (fill()) fill().style.width = "100%";
   if (jump > 1) {
     document.getElementById("curtain").hidden = false;
-    for (let i = 0; i < jump - 1; i++) { onTap(); await sleep(90); }
+    for (let i = 0; i < jump - 1; i++) {
+      const was = state().frame;
+      onTap();
+      for (let t = 0; t < 80 && state().frame === was; t++) await sleep(50);
+      await sleep(90);
+    }
     await sleep(3800);
     document.getElementById("curtain").hidden = true;
     onTap();
