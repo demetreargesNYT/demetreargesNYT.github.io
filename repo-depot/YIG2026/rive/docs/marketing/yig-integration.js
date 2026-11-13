@@ -162,7 +162,7 @@ function onAdClosed() {
   const c = cards[frame];
   if (!c?.ad) return;
   const token = ++holdToken;
-  afterPan(c.file - 1, () => { if (token === holdToken && cards[frame] === c) move(+1); });
+  afterPan(c.file - 1, () => { if (token === holdToken && cards[frame] === c) move(+1); }, PAN_MS);
 }
 
 function show(i) {
@@ -215,8 +215,8 @@ function move(step) {
     hopDone.then(() => { if (token === holdToken) move(step); });
     return;
   }
-  if (step > 0 && to.file !== from.file && panRunning(from.file - 1)) {
-    afterPan(from.file - 1, () => { if (token === holdToken) move(step); });
+  if (step > 0 && to.file !== from.file && (performance.now() - (files[from.file - 1]?.setAt ?? -1e9) < PAN_MS || panRunning(from.file - 1))) {
+    afterPan(from.file - 1, () => { if (token === holdToken) move(step); }, PAN_MS);
     return;
   }
   const fi = to.file - 1;
@@ -234,7 +234,7 @@ function move(step) {
   const key = `${to.file}:${room}`;
   const firstVisit = roomChange && step > 0 && !visited.has(key) && !FILES[fi].noIntro.includes(room);
   if (roomChange) {
-    pan = { dir: step, endsAt: now + (legs - 1) * PAN_END_MS + PAN_MS };
+    pan = { dir: step, endsAt: now + legs * PAN_MS };
     if (to.file === from.file) {
       setScene(fi, to.scene, step, !!to.community, to.reveal);
     } else if (step > 0) {
@@ -246,7 +246,7 @@ function move(step) {
         let started;
         hopDone = new Promise((resolve) => { started = resolve; });
         hopRun = takeOver;
-        afterPan(from.file - 1, () => { takeOver(); pan.endsAt = performance.now() + PAN_MS; started(); }, PAN_END_MS);
+        afterPan(from.file - 1, () => { takeOver(); pan.endsAt = performance.now() + PAN_MS; started(); }, PAN_MS);
       }
     } else {
       setScene(from.file - 1, FILES[from.file - 1].opens, step, false);
@@ -255,13 +255,13 @@ function move(step) {
         if (mine !== swapToken) return;
         show(fi);
         if (legs === 2) { setScene(fi, to.scene, step, !!to.community, to.reveal); pan.endsAt = performance.now() + PAN_MS; }
-      }, PAN_END_MS);
+      }, PAN_MS);
     }
   }
   if (!roomChange && sceneChange) setScene(fi, to.scene, step, !!to.community, to.reveal);
   if (firstVisit) {
     visited.add(key);
-    copyFrom[key] = now + (legs - 1) * PAN_END_MS + firstVisitCopyMs(to);
+    copyFrom[key] = now + (legs - 1) * PAN_MS + firstVisitCopyMs(to);
     firstVisits[key] = { setAt: now, waitKey: legs === 2 ? "crossing_to_new_room" : lockupShows(to) ? "game_first_card" : "first_visit" };
   }
   const iconChange = to.icon !== from.icon;
@@ -269,7 +269,7 @@ function move(step) {
   let delay;
   if (!roomChange) delay = fading ? Math.max(settleLeft, REVEAL_FADE_MS) : settleLeft > 0 ? settleLeft : null;
   else if (firstVisit) delay = copyFrom[key] - now;
-  else delay = Math.max((legs - 1) * PAN_END_MS + PAN_MS, settleLeft);
+  else delay = Math.max(legs * PAN_MS, settleLeft);
   const onFirst = !firstVisit && settleLeft > 0 && delay === settleLeft && !!firstVisits[key];
   const waitKey = onFirst ? firstVisits[key].waitKey
     : firstVisit ? firstVisits[key].waitKey

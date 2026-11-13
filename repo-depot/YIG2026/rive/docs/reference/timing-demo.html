@@ -402,9 +402,9 @@ const RULES = {
   "skip-in": { say: (ms) => `A room already built: ${secs(ms)} s (a seen ad is skipped)` },
   "same-room": { say: (ms) => `The same room: ${secs(ms)} s` },
   reveal: { say: (ms) => `Chapter 4's reveal: ${secs(ms)} s (reveal changed, so the copy waits for the wall's fade)` },
-  "two-first": { say: (ms) => `Crossing between two files: ${secs(PAN_END_MS)} + ${secs(ms - PAN_END_MS)} = ${secs(ms)} s` },
-  "two-back": { say: (ms) => `Crossing between two files: ${secs(PAN_END_MS)} + ${secs(ms - PAN_END_MS)} = ${secs(ms)} s` },
-  "skip-across": { say: (ms) => `Crossing between two files, a seen ad skipped: ${secs(PAN_END_MS)} + ${secs(ms - PAN_END_MS)} = ${secs(ms)} s` },
+  "two-first": { say: (ms) => `Crossing between two files: ${secs(PAN_MS)} + ${secs(ms - PAN_MS)} = ${secs(ms)} s` },
+  "two-back": { say: (ms) => `Crossing between two files: ${secs(PAN_MS)} + ${secs(ms - PAN_MS)} = ${secs(ms)} s` },
+  "skip-across": { say: (ms) => `Crossing between two files, a seen ad skipped: ${secs(PAN_MS)} + ${secs(ms - PAN_MS)} = ${secs(ms)} s` },
   settle: { say: (ms) => `Copy still on its way: the wait isn't restarted, it arrives ${secs(ms)} s from now` },
   jump: { say: () => "Opened on a scene with startScene: the copy appears right away" },
 };
@@ -430,7 +430,7 @@ const readout = {
     this.line(same ? "dim" : "", `<span class="f">File ${file}</span>${name} = ${typeof value === "string" ? `'${value}'` : value}${same ? ' <span class="t">(already this)</span>' : ""}${after}`);
   },
   note(text) { this.line("dim", `<span class="f"></span>${text}`); },
-  twoMoves(legs) { if (legs === 2) this.pending = this.line("pending", "then the second move, when the first pan ends (isPanning false, about 1.55 s)"); },
+  twoMoves(legs) { if (legs === 2) this.pending = this.line("pending", "then the second move, after 1.65 s (later only if isPanning is still true then)"); },
   held(ms, what = "a Back during a pan") { const h = document.getElementById("held"); h.hidden = false; h.textContent = `Held: ${what} waits ${secs(ms)} s for the pan to end, then runs.`; },
   nothing(msg) { this.tap(msg); this.line("note", "Nothing was set."); this.setWait(null); document.getElementById("rule").innerHTML = "&nbsp;"; document.getElementById("timer").innerHTML = "&nbsp;"; this.hit(null); },
   wait(rule, ms) {
@@ -465,7 +465,7 @@ function renderTable() {
   document.getElementById("waits").innerHTML = rows.map(([key, name, ms, sub]) =>
     `<tr data-key="${key}"><td>${name}<small>${sub}</small></td><td class="n">${secs(ms)} s</td></tr>`).join("");
   document.getElementById("crossing").textContent =
-    `Crossing between two files adds two waits together: the first pan ends at ${secs(PAN_END_MS)} s, then the second move's wait: ${secs(PAN_END_MS)} + ${secs(FIRST_VISIT_MS)} = ${secs(PAN_END_MS + FIRST_VISIT_MS)} s forward to a new room, ${secs(PAN_END_MS)} + ${secs(PAN_MS)} = ${secs(PAN_END_MS + PAN_MS)} s otherwise.`;
+    `Crossing between two files adds two waits together: ${secs(PAN_MS)} + ${secs(FIRST_VISIT_MS)} = ${secs(PAN_MS + FIRST_VISIT_MS)} s forward to a new room, ${secs(PAN_MS)} + ${secs(PAN_MS)} = ${secs(2 * PAN_MS)} s otherwise.`;
 }
 
 function renderStrip() {
@@ -511,7 +511,6 @@ const FIRST_VISIT_MS = cssMs("--yig-first-visit");   // 2.0 s: a room's first vi
 const LOCKUP_MS = cssMs("--yig-lockup");             // 3.2 s: a Chapter 2 game's first card, with its lockup
 const CLEAR_MS = cssMs("--yig-clear");               // 0.34 s: the old copy has cleared
 const PAN_MS = 1650;                                 // 1.6 s pan plus a few frames
-const PAN_END_MS = 1550;                             // the pan's last frame: in your code, the leaving file's isPanning turns false
 const REVEAL_MS = 1450;                              // 1.45 s: Chapter 4's wall fades when reveal changes
 
 // Each file's first and last picture, and the scenes that have no intro of their own.
@@ -575,10 +574,11 @@ function go(step) {
   if (roomChange) clearTimeout(swapTimer);
   // A Next during a crossing waits until its second move has started; only the last waiting tap counts.
   if (step > 0 && hopRun) { hopNext = () => go(step); return; }
-  // A Next into another file waits until the leaving file's pan has ended (isPanning false): an ad that closed at once.
-  if (step > 0 && to.file !== from.file && pan.dir > 0 && now < pan.startAt + PAN_END_MS) {
-    readout.held(pan.startAt + PAN_END_MS - now, "a Next into the next file");
-    heldTimer = setTimeout(() => go(step), pan.startAt + PAN_END_MS - now);
+  // A Next into another file is shown 1.65 s after the leaving file's move (an ad that closed at once); in your code, later only if
+  // the leaving file's isPanning is still true then.
+  if (step > 0 && to.file !== from.file && pan.dir > 0 && now < pan.startAt + PAN_MS) {
+    readout.held(pan.startAt + PAN_MS - now, "a Next into the next file");
+    heldTimer = setTimeout(() => go(step), pan.startAt + PAN_MS - now);
     return;
   }
   readout.tap(`${step > 0 ? "Next" : "Back"} to ${to.label}`, skipped ? `${cards[frame + step].label} was already seen, so the tap skips it.` : "");
@@ -591,7 +591,7 @@ function go(step) {
   if (!roomChange && sceneChange) setScene(to.file, to, step);   // same room: it keeps looping, the copy swaps
 
   if (roomChange) {
-    pan = { dir: step, startAt: now, endsAt: now + (legs - 1) * PAN_END_MS + PAN_MS };
+    pan = { dir: step, startAt: now, endsAt: now + PAN_MS * legs };
     if (to.file === from.file) {
       setScene(to.file, to, step);
     } else if (step > 0) {
@@ -602,23 +602,23 @@ function go(step) {
       };
       if (legs === 1) takeOver();
       else {
-        // first the room pans out to the empty room; when that pan ends (isPanning false), the next file takes over
+        // first the room pans out to the empty room, then the next file takes over
         readout.twoMoves(legs);
         setScene(from.file, { scene: FILES[from.file - 1].ends }, step);
         hopRun = takeOver;
-        hopTimer = setTimeout(takeOver, PAN_END_MS);
+        hopTimer = setTimeout(takeOver, PAN_MS);
       }
     } else {
-      // Back into the earlier file: pan back to the shared picture; when that pan ends, hand the stage back, then pan into the card.
+      // Back into the earlier file: pan back to the shared picture; 1.65 s later, hand the stage back, then pan into the card.
       readout.twoMoves(legs);
       setScene(from.file, { scene: FILES[from.file - 1].opens }, step);
-      swapTimer = setTimeout(() => { show(to.file); if (legs === 2) setScene(to.file, to, step); }, PAN_END_MS);
+      swapTimer = setTimeout(() => { show(to.file); if (legs === 2) setScene(to.file, to, step); }, PAN_MS);
     }
   }
 
   if (firstVisit) {
     visited.add(key);
-    copyFrom[key] = now + (legs - 1) * PAN_END_MS + (lockupShows(to) ? LOCKUP_MS : FIRST_VISIT_MS);
+    copyFrom[key] = now + (legs - 1) * PAN_MS + (lockupShows(to) ? LOCKUP_MS : FIRST_VISIT_MS);
   }
   const settleLeft = Math.max(0, (copyFrom[key] ?? 0) - now);   // a first visit's copy is never earlier than its time
   let wait, rule;
@@ -630,7 +630,7 @@ function go(step) {
     wait = copyFrom[key] - now;
     rule = legs === 2 ? "two-first" : lockupShows(to) ? "lockup" : "first-visit";
   } else {
-    wait = Math.max((legs - 1) * PAN_END_MS + PAN_MS, settleLeft);
+    wait = Math.max(PAN_MS * legs, settleLeft);
     rule = skipped ? (legs === 2 ? "skip-across" : "skip-in") : legs === 2 ? "two-back" : to.ad ? "ad-first" : isPicture(to) ? "picture" : "comeback";
   }
   showCopy(target, { changed: roomChange || to.icon !== from.icon, delay: rule === "same-room" ? null : wait, back: step < 0 });
