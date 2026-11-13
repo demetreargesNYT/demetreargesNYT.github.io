@@ -35,6 +35,7 @@ let seenAds = new Set();
 let signalMode = true;
 let reducedMotion = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 let logFn = null;
+let panFn = null;
 let pending = null;
 let cancelled = null;
 const BACKSTOP_EXTRA_MS = 500;
@@ -84,6 +85,10 @@ function load(i) {
           const t = f.rive.viewModelInstance.trigger("copyReady");
           if (t) { f.signal = true; t.on(() => onFire(i)); }
         } catch { /* not declared */ }
+        try {
+          const p = f.rive.viewModelInstance.boolean("isPanning");
+          if (p) { f.panning = p; p.on(() => onPan(i)); }
+        } catch { /* not declared */ }
         requestAnimationFrame(() => requestAnimationFrame(() => { if (i !== shown) f.rive.pause(); }));
         if (i + 1 < FILES.length && !files[i + 1]) load(i + 1);
         resolve();
@@ -112,6 +117,7 @@ function setScene(i, scene, step, community, reveal) {
   vm.enum("direction").value = step < 0 ? "back" : "forward";
   if (FILES[i].lockup) vm.boolean("lockup").value = !community;
   if (reveal !== undefined && vm.boolean("reveal")) vm.boolean("reveal").value = !!reveal;
+  if (vm.enum("scene").value !== scene) files[i].setAt = performance.now();
   vm.enum("scene").value = scene;
 }
 
@@ -307,6 +313,18 @@ function onCopyLog(fn) {
   logFn = fn;
 }
 
+function onPan(i) {
+  const f = files[i];
+  if (!panFn || !f?.panning) return;
+  const since = f.setAt === undefined ? null : performance.now() - f.setAt;
+  panFn({ time: Date.now(), name: "isPanning", file: i + 1, scene: f.rive.viewModelInstance.enum("scene").value, value: !!f.panning.value,
+    since, frame: since === null ? null : Math.round(since * 60 / 1000) });
+}
+
+function onPanLog(fn) {
+  panFn = fn;
+}
+
 function signalFiles() {
   return files.map((f) => (f?.loaded ? !!f.signal : null));
 }
@@ -352,6 +370,7 @@ function resize() {
   files.forEach((f) => f?.loaded && f.rive.resizeDrawingSurfaceToCanvas());
 }
 
-const state = () => ({ frame, shown: shown + 1, card: cards[frame], scenes: files.map((f) => f?.loaded ? f.rive.viewModelInstance.enum("scene").value : null) });
+const state = () => ({ frame, shown: shown + 1, card: cards[frame], scenes: files.map((f) => f?.loaded ? f.rive.viewModelInstance.enum("scene").value : null),
+  panning: files.map((f) => (f?.panning ? !!f.panning.value : null)) });
 
-export { start, onTap, onBack, ready, resize, state, setCopySignal, setReducedMotion, onCopyLog, signalFiles, FILES, GAME_ORDER, COMMUNITY_GAMES };
+export { start, onTap, onBack, ready, resize, state, setCopySignal, setReducedMotion, onCopyLog, onPanLog, signalFiles, FILES, GAME_ORDER, COMMUNITY_GAMES };

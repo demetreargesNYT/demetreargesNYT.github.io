@@ -376,6 +376,7 @@ function sigCols(e) {
   const d = new Date(e.time);
   const t = `${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())}`;
   if (e.note) return [t, e.note];
+  if (e.name === "isPanning") return [t, `F${e.file}`, e.scene ?? "?", "isPanning", e.since === null ? "" : `${(e.since / 1000).toFixed(2)} s`, String(e.value)];
   return [t, `F${e.file}`, e.scene ?? "?", e.waitKey ?? "", e.since === null ? "" : `${(e.since / 1000).toFixed(2)} s`, e.how];
 }
 function sigLines(list) {

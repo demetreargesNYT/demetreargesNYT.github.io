@@ -139,7 +139,7 @@ body.html-off .yig-column, body.html-off .yig-arrow, body.html-off .video-bg { v
 <button class="rive-only-pill" id="rive-only-pill" aria-pressed="false" title="Hide all the HTML and show only the animation (H)">Rive only</button>
 <div class="curtain" id="curtain" hidden>Skipping ahead…</div>
 
-<script type="module">import { start, onTap, onBack, ready, resize, state, setCopySignal, setReducedMotion, onCopyLog, signalFiles, GAME_ORDER, COMMUNITY_GAMES } from "./yig-integration.js";
+<script type="module">import { start, onTap, onBack, ready, resize, state, setCopySignal, setReducedMotion, onCopyLog, onPanLog, signalFiles, GAME_ORDER, COMMUNITY_GAMES } from "./yig-integration.js";
 
 const q = new URLSearchParams(location.search);
 let FLOW = q.get("flow") === "anon" ? "anon" : "sub";
@@ -256,6 +256,11 @@ onCopyLog((ev) => {
   copyLog.push(ev);
   if (parent !== window) parent.postMessage({ type: "yig-copy-log", ev }, "*");
 });
+const panLog = [];
+onPanLog((ev) => {
+  panLog.push(ev);
+  if (parent !== window) parent.postMessage({ type: "yig-copy-log", ev }, "*");
+});
 start(document.getElementById("artboard"), cards);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -358,7 +363,7 @@ setInterval(() => {
   layoutBubble();
 }, 100);
 
-window.yigExperience = { cards, onTap, onBack, state, setCopySignal, signalFiles, copyLog, flow: FLOW, top: TOP, setRiveOnly, riveOnly: () => riveOnly };
+window.yigExperience = { cards, onTap, onBack, state, setCopySignal, signalFiles, copyLog, panLog, flow: FLOW, top: TOP, setRiveOnly, riveOnly: () => riveOnly };
 </script>
 </body>
 </html>
