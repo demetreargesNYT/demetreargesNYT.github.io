@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Year in Games 2026 · extras preview</title>
+<link rel="icon" href="data:,">
+
+<style>body { font: 15px -apple-system, system-ui, sans-serif; margin: 24px; background: #f4f1ea; color: #121212; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  p.note { margin: 0 0 20px; color: #555; max-width: 720px; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .card { background: #fff; border: 1px solid #ccc; border-radius: 10px; padding: 14px; }
+  .card h2 { font-size: 13px; margin: 0 0 10px; font-weight: 600; }
+  .stage { border-radius: 6px; background: var(--bg, #e1dbf5); display: inline-block; }
+  canvas { display: block; }
+  .bar { margin-top: 10px; display: flex; gap: 14px; align-items: center; }
+  button { font: inherit; padding: 4px 12px; cursor: pointer; }
+  .bgs { margin-bottom: 18px; }
+</style>
+</head>
+<body>
+<h1>Year in Games 2026: extras preview</h1>
+<p class="note">Three small animated pieces, shown for feedback; they are not final. Each starts on load. Replay plays the entrance again. "Reduced motion" shows the finished pose with no motion. The background buttons show each piece on a few colours.</p>
+<div class="bgs">Background:
+  <button data-bg="#e1dbf5">purple</button> <button data-bg="#e7f1e1">green</button> <button data-bg="#f0e9d0">cream</button> <button data-bg="#ffffff">white</button> <button data-bg="#222222">dark</button>
+</div>
+<div class="row" id="row"></div>
+<script src="https://cdn.jsdelivr.net/npm/@rive-app/canvas@2.34.0/rive.js"></script>
+<script>const PIECES = [
+  { artboard: "start", label: "Start (2026 lockup)", w: 312, h: 92, scale: 1.5 },
+  { artboard: "chapter-3-event-badges--connections-1000", label: "Connections 1000th badge", w: 258, h: 243, scale: 2 },
+  { artboard: "chapter-3-event-badges--wordle-5", label: "Wordle 5th birthday", w: 99, h: 156, scale: 2.5 },
+];
+const row = document.getElementById("row");
+for (const p of PIECES) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `<h2>${p.label}</h2><div class="stage"><canvas width="${p.w * p.scale * 2}" height="${p.h * p.scale * 2}" style="width:${p.w * p.scale}px;height:${p.h * p.scale}px"></canvas></div>
+    <div class="bar"><button>Replay</button><label><input type="checkbox"> Reduced motion</label></div>`;
+  row.appendChild(card);
+  const canvas = card.querySelector("canvas"), cb = card.querySelector("input");
+  let r = null;
+  function start() {
+    if (r) r.cleanup();
+    r = new rive.Rive({
+      src: "yig-extras-preview.riv", canvas, artboard: p.artboard, stateMachines: p.artboard, autoplay: true, autoBind: true,
+      onLoad: () => { r.resizeDrawingSurfaceToCanvas(); const vm = r.viewModelInstance; if (vm) vm.boolean("reducedMotion").value = cb.checked; },
+    });
+  }
+  card.querySelector("button").onclick = start;
+  cb.onchange = () => { if (r && r.viewModelInstance) r.viewModelInstance.boolean("reducedMotion").value = cb.checked; };
+  start();
+}
+for (const b of document.querySelectorAll("[data-bg]")) b.onclick = () => document.querySelectorAll(".stage").forEach(s => s.style.setProperty("--bg", b.dataset.bg));
+</script>
+</body>
+</html>
