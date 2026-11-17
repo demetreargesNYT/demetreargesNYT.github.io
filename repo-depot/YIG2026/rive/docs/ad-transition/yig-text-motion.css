@@ -1,0 +1,74 @@
+:root {
+  --yig-first-visit: 2s;
+  --yig-lockup: 3.2s;
+  --yig-delay: var(--yig-first-visit);
+  --yig-clear: 340ms;
+  --yig-rise: 720ms;
+  --yig-lift: 240ms;
+  --yig-pop: 560ms;
+  --yig-step: 120ms;
+  --yig-lift-step: 20ms;
+  --yig-ease-rise: cubic-bezier(0.22, 1, 0.36, 1);
+  --yig-ease-lift: cubic-bezier(0.4, 0, 1, 1);
+  --yig-ease-pop: cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+.yig-text.yig-quick { --yig-delay: var(--yig-clear); }
+
+.yig-mask { display: block; overflow: hidden; padding-block: 0.08em 0.2em; margin-block: -0.08em -0.2em; }
+.yig-line, .yig-pop { display: block; }
+
+.yig-text > :nth-child(1) { --yig-n: 0; } .yig-text > :nth-child(2) { --yig-n: 1; }
+.yig-text > :nth-child(3) { --yig-n: 2; } .yig-text > :nth-child(4) { --yig-n: 3; }
+.yig-text > :nth-child(5) { --yig-n: 4; } .yig-text > :nth-child(6) { --yig-n: 5; }
+.yig-text > :nth-child(7) { --yig-n: 6; } .yig-text > :nth-child(8) { --yig-n: 7; }
+
+.yig-in .yig-line {
+  animation: yig-rise var(--yig-rise) var(--yig-ease-rise) both;
+  animation-delay: calc(var(--yig-delay) + var(--yig-n, 0) * var(--yig-step));
+}
+.yig-in .yig-pop {
+  animation: yig-pop var(--yig-pop) var(--yig-ease-pop) both;
+  animation-delay: calc(var(--yig-delay) + var(--yig-n, 0) * var(--yig-step));
+}
+
+.yig-in.yig-after-icon .yig-line { animation-delay: calc(var(--yig-delay) + (var(--yig-n, 0) + 1) * var(--yig-step)); }
+.yig-in:not(:has(.yig-mask, .yig-pop)) {
+  animation: yig-rise-block var(--yig-rise) var(--yig-ease-rise) both;
+  animation-delay: var(--yig-delay);
+}
+.yig-out .yig-line {
+  animation: yig-lift var(--yig-lift) var(--yig-ease-lift) both;
+  animation-delay: calc(var(--yig-n, 0) * var(--yig-lift-step));
+}
+.yig-out .yig-pop, .yig-out:not(:has(.yig-mask, .yig-pop)) {
+  animation: yig-lift-block var(--yig-lift) var(--yig-ease-lift) both;
+}
+
+.yig-back.yig-text > :nth-last-child(1) { --yig-n: 0; } .yig-back.yig-text > :nth-last-child(2) { --yig-n: 1; }
+.yig-back.yig-text > :nth-last-child(3) { --yig-n: 2; } .yig-back.yig-text > :nth-last-child(4) { --yig-n: 3; }
+.yig-back.yig-text > :nth-last-child(5) { --yig-n: 4; } .yig-back.yig-text > :nth-last-child(6) { --yig-n: 5; }
+.yig-back.yig-text > :nth-last-child(7) { --yig-n: 6; } .yig-back.yig-text > :nth-last-child(8) { --yig-n: 7; }
+.yig-back.yig-in .yig-line { animation-name: yig-descend; }
+.yig-back.yig-in:not(:has(.yig-mask, .yig-pop)) { animation-name: yig-descend-block; }
+.yig-back.yig-out .yig-line { animation-name: yig-drop; }
+.yig-back.yig-out .yig-pop, .yig-back.yig-out:not(:has(.yig-mask, .yig-pop)) { animation-name: yig-drop-block; }
+
+@keyframes yig-rise    { 0% { transform: translateY(90%); opacity: 0; } 55% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes yig-descend { 0% { transform: translateY(-90%); opacity: 0; } 55% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+
+@keyframes yig-lift { to { transform: translateY(-40%); opacity: 0; } }
+@keyframes yig-drop { to { transform: translateY(40%); opacity: 0; } }
+@keyframes yig-pop  { 0% { transform: translateY(0.12em) scale(0.9); opacity: 0; } 50% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes yig-rise-block    { 0% { transform: translateY(0.5em); opacity: 0; } 55% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes yig-descend-block { 0% { transform: translateY(-0.5em); opacity: 0; } 55% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes yig-lift-block { to { transform: translateY(-0.3em); opacity: 0; } }
+@keyframes yig-drop-block { to { transform: translateY(0.3em); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .yig-in .yig-line, .yig-in .yig-pop, .yig-in:not(:has(.yig-mask, .yig-pop)),
+  .yig-back.yig-in .yig-line, .yig-back.yig-in:not(:has(.yig-mask, .yig-pop)) { animation-name: yig-fade-in; animation-duration: 200ms; }
+  .yig-out .yig-line, .yig-out .yig-pop, .yig-out:not(:has(.yig-mask, .yig-pop)),
+  .yig-back.yig-out .yig-line, .yig-back.yig-out .yig-pop, .yig-back.yig-out:not(:has(.yig-mask, .yig-pop)) { animation-name: yig-fade-out; animation-duration: 200ms; }
+}
+@keyframes yig-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes yig-fade-out { to { opacity: 0; } }

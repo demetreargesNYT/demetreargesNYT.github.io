@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ad transition stage</title>
+<link rel="icon" href="data:,">
+
+<script>{ const q = new URLSearchParams(location.search);
+  document.write('<script src="' + (q.get("local") === "1" ? "node_modules/@rive-app/canvas/rive.js" : "https://cdn.jsdelivr.net/npm/@rive-app/canvas@2.34.0/rive.js") + '"><\/script>'); }
+</script>
+<link rel="stylesheet" href="yig-text-motion.css">
+<link rel="stylesheet" href="yig-framing.css">
+<style>@font-face { font-family: "NYT Franklin"; font-weight: 500; src: url(fonts/nyt-franklin-500.woff2) format("woff2"); }
+@font-face { font-family: "NYT Franklin"; font-weight: 700; src: url(fonts/nyt-franklin-700.woff2) format("woff2"); }
+@font-face { font-family: "NYT Karnak"; font-weight: 500; src: url(fonts/nyt-karnak-500.woff2) format("woff2"); }
+@font-face { font-family: "NYT Karnak"; font-weight: 700; src: url(fonts/nyt-karnak-700.woff2) format("woff2"); }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #F1ECC0; color: #121212; }
+body { font: 500 14px/1.4 "NYT Franklin", "Helvetica Neue", Arial, sans-serif; }
+
+:root {
+  --chrome-out: 200ms;
+  --chrome-in: 300ms;
+  --ad-in: 300ms;
+  --ad-rise: 0px;
+  --ad-out: 200ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+body.current { --chrome-out: 0ms; --chrome-in: 0ms; --ad-in: 0ms; --ad-out: 0ms; }
+body.rm { --ad-rise: 0px; }
+
+.fade { transition: opacity var(--chrome-in) var(--ease-out); }
+.fade.off { opacity: 0; pointer-events: none; transition: opacity var(--chrome-out) var(--ease-in); }
+
+.yig-column { position: fixed; z-index: 1; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100vw, var(--yig-nav-column)); pointer-events: none; }
+.overlay { position: absolute; inset: 0; color: var(--yig-copy-ink); }
+.nav-logo { position: absolute; top: var(--yig-logo-top); left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: var(--yig-logo-gap); }
+.nav-logo img { display: block; }
+.nav-progress { position: absolute; top: var(--yig-progress-top); left: 50%; transform: translateX(-50%); width: var(--yig-progress-w); height: var(--yig-progress-h);
+  border-radius: var(--yig-progress-radius); background: var(--yig-progress-track); overflow: hidden; }
+.nav-progress > span { display: block; height: 100%; width: 12%; background: var(--yig-progress-fill); }
+.blk { position: absolute; left: var(--yig-copy-side); right: var(--yig-copy-side); text-align: center; display: grid; justify-items: center; }
+.blk-copy { top: var(--yig-copy-top); }
+.t-serif { font: 500 24px / 1.2 "NYT Karnak", Georgia, serif; }
+body.rm .yig-in .yig-line { animation-name: yig-fade-in; animation-duration: 200ms; }
+
+.splash-lockup { position: absolute; top: 197px; left: 50%; width: 294px; height: 166px; transform: translateX(-50%); }
+.splash-lockup > img { position: absolute; display: block; }
+.splash-tiles { position: absolute; top: 90px; left: 0; width: 294px; height: 76px; }
+.splash-tiles span { position: absolute; top: 0; height: 76px; display: block; background: #FFF; border: 1.5px solid #121212; padding-top: 20px;
+  text-align: center; font: 900 40px / 39.58px "NYT Franklin", "Arial Black", Arial, sans-serif; color: #121212; }
+.splash-tiles span:nth-child(1) { left: 0; width: 76px; }
+.splash-tiles span:nth-child(2) { left: 74px; width: 75.06px; }
+.splash-tiles span:nth-child(3) { left: 147.06px; width: 75.06px; }
+.splash-tiles span:nth-child(4) { left: 220.13px; width: 75.06px; }
+.splash-btn { position: absolute; top: 403px; left: 50%; transform: translateX(-50%); display: grid; place-items: center; width: 196px; height: 48px; border-radius: 999px;
+  background: #000; color: #FFF; font: 700 16px / 1 "NYT Franklin", Arial, sans-serif; transition: transform 120ms ease; }
+.splash-btn.press { transform: translateX(-50%) scale(0.95); }
+.splash-support { position: absolute; top: 471px; left: 50%; transform: translateX(-50%); width: 130px; height: 56px; display: grid; grid-template-rows: 16px 40px; justify-items: center; align-items: center;
+  font: 500 11px / 14px "NYT Franklin", Arial, sans-serif; }
+.splash-support > span { align-self: start; }
+.splash-support img { display: block; width: 118px; height: 24px; }
+.splash { position: absolute; inset: 0; }
+
+.yig-arrow { position: fixed; top: 50%; z-index: 3; width: 56px; height: 56px; transform: translateY(-50%); display: none; }
+.yig-arrow img { width: 56px; height: 56px; display: block; }
+.yig-arrow.back { left: 20px; } .yig-arrow.next { right: 20px; }
+.yig-arrow.next img { transform: scaleX(-1); }
+@media (min-width: 1025px) { .yig-arrow { display: block; } }
+
+.status { position: fixed; z-index: 6; top: 0; left: 0; right: 0; height: 56px; display: flex; justify-content: space-between; align-items: center; padding: 0 26px 0 48px;
+  font: 600 16px/1 -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; color: #000; pointer-events: none; }
+@media (min-width: 1025px) { .status { display: none; } }
+
+.ad { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 0; visibility: hidden; }
+.ad.in { opacity: 1; visibility: visible; transition: opacity var(--ad-in) var(--ease-out); }
+.ad.leaving { opacity: 0; visibility: visible; transition: opacity var(--ad-out) var(--ease-in); }
+.ad .lift { transform: translateY(var(--ad-rise)); }
+.ad.in .lift { transform: none; transition: transform var(--ad-in) var(--ease-out); }
+.ad-phone, .ad-desk { position: absolute; inset: 0; }
+.ad-desk { display: none; }
+@media (min-width: 1025px) { .ad-desk { display: block; } .ad-phone { display: none; } }
+.slug { font: 500 11px/1 "NYT Franklin", Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: #5A5A5A; text-align: center; }
+.creative { position: absolute; display: grid; place-items: center; background: #FFCCCC; color: #000; overflow: hidden;
+  font: 700 60px/1 "NYT Franklin", "Arial Black", Arial, sans-serif; }
+
+.count { position: absolute; display: flex; align-items: center; gap: 8px; font: 700 16px/18px "NYT Franklin", Arial, sans-serif; color: #121212; }
+.count b { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #121212; color: #FFF; font: 700 15px/1 "NYT Franklin", Arial, sans-serif; }
+.count.ready { padding: 4px 14px; height: 26px; border-radius: 999px; background: #121212; color: #FFF; transition: transform 120ms ease; }
+.count.ready b { display: none; }
+.count.press { transform: scale(0.95); }
+
+.ad-phone .bar { position: absolute; top: 59px; left: 0; right: 0; height: 33px; display: grid; place-items: center; background: #F7F7F7; }
+.ad-phone .creative { top: 92px; left: 0; right: 0; height: 644px; }
+.ad-phone .count { right: 15px; top: 761.5px; }
+.creative .vid { position: absolute; left: 14px; bottom: 22px; display: flex; gap: 10px; }
+.creative .vid i { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #121212; display: block; }
+.creative .more { position: absolute; right: 14px; bottom: 20px; padding: 10px 18px; border-radius: 999px; background: #121212; color: #FFF; font: 700 15px/1 "NYT Franklin", Arial, sans-serif; }
+
+.ad-desk .band { position: absolute; top: 195px; left: 0; right: 0; height: 677px; background: #F7F7F7; border-top: 1px solid #E2E2E2; border-bottom: 1px solid #E2E2E2; }
+.ad-desk .slug { position: absolute; top: 1px; left: 0; right: 0; height: 43px; line-height: 43px; }
+.ad-desk .creative { top: 43px; left: 185px; width: 1125px; height: 600px; }
+.ad-desk .count { right: 51px; top: 994px; }
+</style>
+</head>
+<body>
+<div class="yig-background"><div class="yig-artboard" id="artboard"><canvas class="yig-file" id="cv"></canvas></div></div>
+<div class="status"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13" aria-hidden="true"><g fill="#000"><rect x="0" y="8" width="3" height="5" rx="1"/><rect x="5" y="5.5" width="3" height="7.5" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/><path d="M30 3.2a9 9 0 0 1 12 0l-1.5 1.6a6.8 6.8 0 0 0-9 0zM32.6 6a5.2 5.2 0 0 1 6.8 0l-1.5 1.6a3 3 0 0 0-3.8 0zM36 9.2l1.6 1.7L36 12.6l-1.6-1.7z"/><rect x="47" y="1" width="20" height="11" rx="3" fill="none" stroke="#000" stroke-opacity=".4"/><rect x="49" y="3" width="16" height="7" rx="1.6"/><rect x="68" y="4.5" width="1.6" height="4" rx=".8" fill-opacity=".4"/></g></svg></div>
+
+<main class="yig-column"><div class="overlay">
+  <div class="fade off" id="header">
+    <div class="nav-logo"><img src="assets/yig-nyt-small.svg" width="110.136" height="15.1138" alt=""><img src="assets/yig-year-in-games.svg" width="170.215" height="18.5492" alt=""></div>
+    <div class="nav-progress"><span></span></div>
+  </div>
+  <div class="fade" id="start">
+    <div class="splash">
+      <div class="splash-lockup">
+        <img src="assets/yig-start-nyt.svg" width="188.405" height="24.7193" style="left: 52.8px; top: 0.64px" alt="">
+        <img src="assets/yig-start-year-in-games.svg" width="293.646" height="32" style="left: 0.18px; top: 38px" alt="">
+        <div class="splash-tiles"><span>2</span><span>0</span><span>2</span><span>6</span></div>
+      </div>
+      <div class="splash-btn" id="go-btn">Let’s go</div>
+      <div class="splash-support"><span>Supported by</span><img src="assets/t-mobile.svg" alt="T-Mobile"></div>
+    </div>
+  </div>
+  <div class="yig-text blk blk-copy" id="copy" hidden><span class="yig-mask"><span class="yig-line t-serif">This year, you turned downtime into playtime.</span></span></div>
+</div></main>
+<div class="yig-arrow back fade off" id="arrow-back"><img src="assets/ui-desktop-button.svg" alt=""></div>
+<div class="yig-arrow next fade" id="arrow-next"><img src="assets/ui-desktop-button.svg" alt=""></div>
+
+<div class="ad" id="ad">
+  <div class="ad-phone">
+    <div class="bar"><span class="slug">Advertisement</span></div>
+    <div class="creative lift">AD 1<span class="vid"><i></i><i></i></span><span class="more">Learn more</span></div>
+    <div class="count" data-label="Continue"><span class="t">Continue in</span><b>5</b></div>
+  </div>
+  <div class="ad-desk">
+    <div class="band"><div class="slug">Advertisement</div><div class="creative lift">AD</div></div>
+    <div class="count" data-label="Skip ad"><span class="t">Skip ad in</span><b>5</b></div>
+  </div>
+</div>
+
+<script>const q = new URLSearchParams(location.search);
+const MODE = q.get("mode") === "current" ? "current" : "proposed";
+const RM = q.get("rm") === "1";
+document.body.classList.toggle("current", MODE === "current");
+document.body.classList.toggle("rm", RM);
+const $ = (id) => document.getElementById(id);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const post = (m) => parent !== window && parent.postMessage({ ...m, mode: MODE }, "*");
+const step = (text) => post({ type: "step", text });
+
+if (q.get("local") === "1") rive.RuntimeLoader.setWasmUrl("node_modules/@rive-app/canvas/rive.wasm");
+let vm, panning, onPanEnd = null, onCopy = null;
+const r = new rive.Rive({
+  src: "yig-ad-demo.riv",
+  canvas: $("cv"),
+  stateMachines: "Backdrop",
+  autoplay: true,
+  autoBind: true,
+  onLoad: async () => {
+    r.resizeDrawingSurfaceToCanvas();
+    vm = r.viewModelInstance;
+    vm.boolean("reducedMotion").value = RM;
+    vm.enum("startScene").value = "start";
+    vm.enum("scene").value = "start";
+    panning = vm.boolean("isPanning");
+    panning.on(() => { if (!panning.value && onPanEnd) { const f = onPanEnd; onPanEnd = null; f(); } });
+    vm.trigger("copyReady").on(() => { if (onCopy) { const f = onCopy; onCopy = null; f(); } });
+    await document.fonts.ready;
+    await sleep(400);
+    post({ type: "ready" });
+  },
+});
+addEventListener("resize", () => r.resizeDrawingSurfaceToCanvas());
+
+const panEnd = () => new Promise((res) => {
+  const t0 = performance.now();
+  (function wait() {
+    if (panning.value) { onPanEnd = res; return; }
+    if (performance.now() - t0 > 400) return res();
+    requestAnimationFrame(wait);
+  })();
+});
+const copyReady = (backstopMs) => new Promise((res) => { onCopy = res; setTimeout(() => { if (onCopy === res) { onCopy = null; res(); } }, backstopMs); });
+
+function setScene(s) { vm.enum("direction").value = "forward"; vm.enum("scene").value = s; }
+function chrome(id, on) { $(id).classList.toggle("off", !on); }
+
+async function countdown() {
+  const counts = document.querySelectorAll(".count");
+  for (let n = 5; n >= 1; n--) { counts.forEach((c) => c.querySelector("b").textContent = n); await sleep(1000); }
+  counts.forEach((c) => { c.classList.add("ready"); c.querySelector(".t").textContent = c.dataset.label + " ›"; });
+  step("Countdown done: the player taps " + (innerWidth < 1025 ? "Continue" : "Skip ad"));
+  await sleep(700);
+  counts.forEach((c) => c.classList.add("press"));
+  await sleep(140);
+  counts.forEach((c) => c.classList.remove("press"));
+}
+
+async function play() {
+  const ad = $("ad");
+  step("Start");
+  await sleep(1500);
+  $("go-btn").classList.add("press"); await sleep(140); $("go-btn").classList.remove("press");
+
+  const adLoaded = sleep(600);
+  if (MODE === "current") {
+    chrome("start", false); chrome("arrow-next", false);
+    setScene("ad");
+    ad.classList.add("in");
+    step("Tap: chrome cuts out, ad mounts at once while the room is still panning");
+  } else {
+    chrome("start", false); chrome("arrow-next", false);
+    setScene("ad");
+    step(RM ? "Tap: chrome fades out (0.2 s); the room cuts" : "Tap: chrome fades out (0.2 s) as the room pans (1.55 s)");
+    await Promise.all([panEnd(), adLoaded, sleep(200)]);
+    ad.classList.add("in");
+    step("Room has stopped (isPanning false): ad fades in (0.3 s)");
+  }
+  await countdown();
+
+  if (MODE === "current") {
+    ad.classList.remove("in");
+    chrome("header", true); chrome("arrow-back", true); chrome("arrow-next", true);
+    setScene("chapter-1");
+    step("Tap: ad and chrome swap in one frame, the pan starts at the same moment");
+  } else {
+    ad.classList.add("leaving"); ad.classList.remove("in");
+    step("Tap: ad fades out first (0.2 s)");
+    await sleep(200);
+    ad.classList.remove("leaving");
+    setScene("chapter-1");
+    step(RM ? "Then the room cuts to Chapter 1" : "Then the room pans to Chapter 1 (1.55 s)");
+    panEnd().then(() => {
+      chrome("header", true); chrome("arrow-back", true); chrome("arrow-next", true);
+      step("Room has arrived: header and arrows fade back in (0.3 s)");
+    });
+  }
+  await copyReady(2600);
+  const c = $("copy"); c.hidden = false; c.style.setProperty("--yig-delay", "0s"); c.classList.add("yig-in");
+  step("copyReady: the copy rises in");
+  await sleep(2200);
+  post({ type: "done" });
+}
+addEventListener("message", (e) => { if (e.data?.type === "go") play(); });
+if (parent === window) addEventListener("load", () => setTimeout(play, 1200));
+</script>
+</body>
+</html>

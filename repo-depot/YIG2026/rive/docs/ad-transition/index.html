@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ad Transition</title>
+<link rel="icon" href="data:,">
+
+<style>@font-face { font-family: "NYT Franklin"; font-weight: 700; src: url(fonts/nyt-franklin-700.woff2) format("woff2"); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #2B2B2B; }
+body { display: grid; grid-template-rows: auto 1fr; font: 700 14px/1 "NYT Franklin", "Helvetica Neue", Arial, sans-serif; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; padding: 14px 16px; }
+.seg { display: inline-flex; border-radius: 999px; overflow: hidden; background: #3D3D3D; }
+.seg button, .play, .chk { font: inherit; border: 0; background: none; color: #FFF; padding: 10px 16px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #FFF; color: #121212; }
+.chk { display: inline-flex; gap: 8px; align-items: center; border-radius: 999px; background: #3D3D3D; }
+.chk input { margin: 0; accent-color: #FFF; }
+.play { background: #FFF; color: #121212; border-radius: 999px; padding: 10px 22px; }
+.play:disabled { opacity: .5; cursor: default; }
+.wrap { display: grid; place-items: center; padding: 0 16px 20px; min-height: 0; }
+.screen { position: relative; overflow: hidden; background: #F1ECC0; }
+.screen iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="seg" role="group" aria-label="Screen"><button data-device="phone" aria-pressed="true">Phone</button><button data-device="desktop" aria-pressed="false">Desktop</button></div>
+  <label class="chk"><input type="checkbox" id="rm"> Reduced motion</label>
+  <button class="play" id="play" disabled>Loading…</button>
+</div>
+<div class="wrap" id="wrap"><div class="screen" id="screen"><iframe id="stage" title="Ad transition"></iframe></div></div>
+<script>const q = new URLSearchParams(location.search);
+let device = q.get("device") === "desktop" ? "desktop" : "phone";
+const SIZE = { phone: [375, 812], desktop: [1495, 1067] };
+const playBtn = document.getElementById("play"), frame = document.getElementById("stage"), screen = document.getElementById("screen");
+
+function fit() {
+  const [w, h] = SIZE[device], wrap = document.getElementById("wrap");
+  const k = Math.min(1, (wrap.clientWidth - 32) / w, (wrap.clientHeight - 20) / h);
+  screen.style.width = `${w * k}px`; screen.style.height = `${h * k}px`;
+  screen.style.borderRadius = device === "phone" ? `${44 * k}px` : `${16 * k}px`;
+  frame.style.width = `${w}px`; frame.style.height = `${h}px`; frame.style.transform = `scale(${k})`;
+}
+function load(autoplay) {
+  playBtn.disabled = true; playBtn.textContent = "Loading…";
+  const rm = document.getElementById("rm").checked ? "1" : "0";
+  frame.dataset.autoplay = autoplay ? "1" : "";
+  frame.src = `stage.html?mode=proposed&rm=${rm}${q.get("local") === "1" ? "&local=1" : ""}&n=${Date.now()}`;
+  fit();
+}
+addEventListener("message", (e) => {
+  const d = e.data || {};
+  if (d.type === "ready") {
+    if (frame.dataset.autoplay === "1") go();
+    else { playBtn.disabled = false; playBtn.textContent = "Play"; }
+  }
+  if (d.type === "done") { playBtn.disabled = false; playBtn.textContent = "Replay"; document.body.dataset.done = "1"; }
+});
+function go() { playBtn.disabled = true; playBtn.textContent = "Playing…"; delete document.body.dataset.done; frame.contentWindow.postMessage({ type: "go" }, "*"); }
+playBtn.addEventListener("click", () => playBtn.textContent === "Replay" ? load(true) : go());
+document.querySelectorAll("[data-device]").forEach((b) => b.addEventListener("click", () => {
+  device = b.dataset.device;
+  document.querySelectorAll("[data-device]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  load(false);
+}));
+const rmBox = document.getElementById("rm");
+rmBox.checked = q.get("rm") === "1";
+rmBox.addEventListener("change", () => load(false));
+document.querySelectorAll("[data-device]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.device === device)));
+addEventListener("resize", fit);
+load(q.get("autoplay") === "1");
+</script>
+</body>
+</html>
