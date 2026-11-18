@@ -110,6 +110,9 @@ body.html-off .yig-column, body.html-off .yig-arrow, body.html-off .video-bg { v
   background: rgba(18, 18, 18, .55); color: #FFF; font: 600 11px / 1.4 "NYT Franklin", Arial, sans-serif; opacity: .7; }
 .rive-only-pill:hover, .rive-only-pill:focus-visible { opacity: 1; }
 .rive-only-pill[aria-pressed="true"] { background: #121212; opacity: 1; }
+
+.yig-how-to { z-index: 30; pointer-events: none; visibility: hidden; }
+.yig-how-to[data-showing="1"] { visibility: visible; }
 .curtain { position: fixed; inset: 0; z-index: 9; background: #F1ECC0; display: grid; place-items: center; font: 600 14px "NYT Franklin", Arial, sans-serif; }
 .rive-only-pill { display: none !important; }
 </style>
@@ -138,6 +141,7 @@ body.html-off .yig-column, body.html-off .yig-arrow, body.html-off .video-bg { v
 <button class="yig-arrow" data-dir="next" id="arrow-next" aria-label="Next"><img src="icons/ui-desktop-button.svg" alt=""></button>
 <button class="rive-only-pill" id="rive-only-pill" aria-pressed="false" title="Hide all the HTML and show only the animation (H)">Rive only</button>
 <div class="curtain" id="curtain" hidden>Skipping ahead…</div>
+<div class="yig-background yig-how-to" id="how-to" aria-hidden="true"><div class="yig-artboard"><canvas class="yig-file" id="how-to-canvas"></canvas></div></div>
 
 <script type="module">import { start, onTap, onBack, ready, resize, state, setCopySignal, setReducedMotion, onCopyLog, onPanLog, signalFiles, GAME_ORDER, COMMUNITY_GAMES } from "./yig-integration.js";
 
@@ -367,6 +371,75 @@ setInterval(() => {
   videoBg.style.opacity = k.kind === "video" ? 1 : 0;
   layoutBubble();
 }, 100);
+
+const HOW_TO = { file: "yig-how-to-preview.riv", wait: 5000, breakpoint: 1025, on: q.get("howTo") !== "0", rive: null, vm: null, ready: false,
+  showing: false, played: false, dismissed: false, at: -1, reached: 0, timer: 0, log: [] };
+function howToLog(event, value) {
+  const ev = { time: Date.now(), name: "howTo", event, scene: cards[state().frame]?.scene, since: HOW_TO.reached ? performance.now() - HOW_TO.reached : null, value };
+  HOW_TO.log.push(ev);
+  if (parent !== window) parent.postMessage({ type: "yig-copy-log", ev }, "*");
+}
+async function howToLoad() {
+  if (HOW_TO.rive || HOW_TO.loading || !window.rive || innerWidth >= HOW_TO.breakpoint) return;
+  HOW_TO.loading = true;
+  let buffer;
+  try {
+    const r = await fetch(HOW_TO.file);
+    buffer = r.ok ? await r.arrayBuffer() : null;
+    if (buffer && new TextDecoder().decode(buffer.slice(0, 4)) !== "RIVE") buffer = null;
+  } catch { buffer = null; }
+  if (!buffer) return;
+  const canvas = document.getElementById("how-to-canvas");
+  const rm = q.has("reducedMotion") ? q.get("reducedMotion") === "1" : matchMedia("(prefers-reduced-motion: reduce)").matches;
+  HOW_TO.rive = new window.rive.Rive({
+    buffer, canvas, stateMachines: "how-to", autoplay: true, autoBind: true,
+    onLoad: () => {
+      HOW_TO.rive.resizeDrawingSurfaceToCanvas();
+      HOW_TO.vm = HOW_TO.rive.viewModelInstance;
+      HOW_TO.vm.boolean("reducedMotion").value = rm;
+      const shown = HOW_TO.vm.boolean("isShowing");
+      shown.on(() => {
+        HOW_TO.showing = !!shown.value;
+        document.getElementById("how-to").dataset.showing = HOW_TO.showing ? "1" : "0";
+        howToLog("isShowing", HOW_TO.showing);
+      });
+      HOW_TO.ready = true;
+    },
+    onLoadError: () => { HOW_TO.rive = null; HOW_TO.loading = false; },
+  });
+}
+function howToPlay() {
+  if (!HOW_TO.on || HOW_TO.played || HOW_TO.at < 0 || innerWidth >= HOW_TO.breakpoint) return;
+  if (!HOW_TO.ready) { HOW_TO.timer = setTimeout(howToPlay, 250); return; }
+  HOW_TO.played = true;
+  HOW_TO.dismissed = false;
+  HOW_TO.vm.trigger("play").trigger();
+  howToLog("play");
+}
+function howToDismiss() {
+  if (!HOW_TO.showing || HOW_TO.dismissed) return;
+  HOW_TO.dismissed = true;
+  HOW_TO.vm.trigger("dismiss").trigger();
+  howToLog("dismiss");
+}
+(function watchHowTo() {
+  const k = cards[state().frame];
+  const at = k && k.file === 1 && k.scene === "chapter-1" ? state().frame : -1;
+  if (at !== HOW_TO.at) {
+    HOW_TO.at = at;
+    clearTimeout(HOW_TO.timer);
+    if (at >= 0 && HOW_TO.on && !HOW_TO.played) {
+      HOW_TO.reached = performance.now();
+      HOW_TO.timer = setTimeout(howToPlay, HOW_TO.wait);
+      howToLoad();
+    }
+  }
+  requestAnimationFrame(watchHowTo);
+})();
+addEventListener("pointerdown", howToDismiss, true);
+addEventListener("keydown", (e) => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") howToDismiss(); }, true);
+addEventListener("resize", () => { if (HOW_TO.ready) HOW_TO.rive.resizeDrawingSurfaceToCanvas(); });
+window.yigHowTo = { log: HOW_TO.log, state: () => ({ on: HOW_TO.on, ready: HOW_TO.ready, played: HOW_TO.played, showing: HOW_TO.showing, file: HOW_TO.vm ? HOW_TO.vm.boolean("isShowing").value : null }) };
 
 window.yigExperience = { cards, onTap, onBack, state, setCopySignal, signalFiles, copyLog, panLog, flow: FLOW, top: TOP, setRiveOnly, riveOnly: () => riveOnly };
 </script>

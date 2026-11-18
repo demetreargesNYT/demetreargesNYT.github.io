@@ -173,6 +173,7 @@ body { background: var(--paper); color: var(--ink); font: 500 13px/1.3 var(--ui)
         </div>
         <div class="fin-ctl"><label>Runtime <select id="fin-runtime"><option value="2.27.3">2.27.3</option><option value="2.34.0">2.34.0</option></select></label></div>
         <div class="fin-ctl"><label title="Every file's reducedMotion setting: still rooms, the copy at the usual times"><input type="checkbox" id="fin-rm"> Reduced motion</label></div>
+        <div class="fin-ctl"><label title="The how-to coach mark: on a phone-width window, 5 s after Chapter 1's first card, once per page load (howTo=0 in the link turns it off)"><input type="checkbox" id="fin-howto" checked> Show How-to</label></div>
         <h3>Trigger log</h3>
         <pre id="fin-log" aria-label="Trigger log"></pre>
         <div class="fin-ctl"><button id="fin-log-copy">Copy log</button> <button id="fin-log-clear">Clear log</button></div>
@@ -191,7 +192,7 @@ const RUNTIME = "2.34.0";
 const fin = { on: q.get("devtools") === "1" || q.get("finesse") === "1" || q.get("signal") === "1", speed: 1, timing: {}, key: "", zero: 0, first: true, visited: new Set(), lastTc: 0, paused: false,
   fileTime: {}, lastClk: null, roomSet: {}, lastPos: null, lastSmall: undefined, comment: false, editing: 0, seek: null,
   copy: q.get("copy") === "timer" ? "timer" : "trigger", runtime: q.get("runtime") === "2.27.3" ? "2.27.3" : RUNTIME,
-  rm: q.get("reducedMotion") === "1" };
+  rm: q.get("reducedMotion") === "1", howTo: q.get("howTo") !== "0" };
 let local = false;
 const hooks = { tick() {}, keys() { return false; }, stopped() {}, panelOff() {}, timing() {}, beforeStart: async () => {} };
 
@@ -206,6 +207,7 @@ function stageUrl(jump, goto) {
   if (fin.copy === "timer") p.set("copy", "timer");
   if (fin.runtime !== RUNTIME) p.set("runtime", fin.runtime);
   p.set("reducedMotion", fin.rm ? "1" : "0");
+  p.set("howTo", fin.howTo ? "1" : "0");
   return `stage.html?${p}`;
 }
 function remember() {
@@ -216,6 +218,7 @@ function remember() {
   if (fin.copy === "timer") p.set("copy", "timer");
   if (fin.runtime !== RUNTIME) p.set("runtime", fin.runtime);
   if (fin.rm) p.set("reducedMotion", "1");
+  if (!fin.howTo) p.set("howTo", "0");
   if (q.get("notes-folder")) p.set("notes-folder", q.get("notes-folder"));
   history.replaceState(null, "", `?${p}${riveOnly ? "&rive-only" : ""}`);
 }
@@ -376,6 +379,7 @@ function sigCols(e) {
   const d = new Date(e.time);
   const t = `${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())}`;
   if (e.note) return [t, e.note];
+  if (e.name === "howTo") return [t, "how-to", e.scene ?? "?", e.event, e.since === null ? "" : `${(e.since / 1000).toFixed(2)} s`, e.value === undefined ? "" : String(e.value)];
   if (e.name === "isPanning") return [t, `F${e.file}`, e.scene ?? "?", "isPanning", e.since === null ? "" : `${(e.since / 1000).toFixed(2)} s`, String(e.value)];
   return [t, `F${e.file}`, e.scene ?? "?", e.waitKey ?? "", e.since === null ? "" : `${(e.since / 1000).toFixed(2)} s`, e.how];
 }
@@ -417,6 +421,8 @@ $("fin-runtime").value = fin.runtime;
 $("fin-runtime").addEventListener("change", () => { fin.runtime = $("fin-runtime").value; load(here()); });
 $("fin-rm").checked = fin.rm;
 $("fin-rm").addEventListener("change", () => { fin.rm = $("fin-rm").checked; load(here()); });
+$("fin-howto").checked = fin.howTo;
+$("fin-howto").addEventListener("change", () => { fin.howTo = $("fin-howto").checked; load(here()); });
 $("fin-log-clear").addEventListener("click", () => { sigLog.length = 0; drawSigLog(); });
 $("fin-log-copy").addEventListener("click", () => navigator.clipboard?.writeText(sigLines(sigLog).join("\n")));
 let lacking = new Set();
