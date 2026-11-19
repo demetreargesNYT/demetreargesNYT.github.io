@@ -48,6 +48,9 @@ body { font: 500 14px/1.4 "NYT Franklin", "Helvetica Neue", Arial, sans-serif; }
 .t-icon img { width: 50px; height: auto; display: block; }
 
 .gicon img { width: 50px; height: auto; display: block; margin-bottom: -4px; }
+.gname { display: grid; justify-items: center; row-gap: 8px; }
+.gname img { width: 50px; height: auto; display: block; }
+.gname b { font: 700 18px / 1.2 "NYT Franklin", Arial, sans-serif; }
 .gicon-first img { width: 91px; height: auto; display: block; }
 .wgrid { display: grid; row-gap: 10px; }
 .wrow { display: flex; gap: 4px; justify-content: center; }
@@ -277,7 +280,7 @@ function buildCards() {
        BOT]
     : [[H("This year, you turned|downtime into playtime.")],
        [H("You played a total of"), S("X puzzles"), B("Cheers, super solver.")],
-       [H("Your first puzzle was"), GI("wordle", "-first"), B("January 4, 1:23 p.m.")],
+       [H("Your first puzzle was"), ["gname", own[0] ?? "wordle"], B("January 4, 1:23 p.m.")],
        [H("And your longest streak was|in Connections at"), GI("connections"), S("X days"), B("Keep the wins coming.")],
        BOT];
   const CH1_SCENES = ["chapter-1", "chapter-1-2", "chapter-1-3", "chapter-1-4", "chapter-1-5"];
@@ -343,6 +346,7 @@ function lineHtml([cls, text]) {
   if (cls === "rank") return `<span class="yig-pop rank">${esc(text)}</span>`;
   if (cls === "badges") return `<span class="yig-pop badges">${"<i></i>".repeat(12)}</span>`;
   if (cls === "pill") return `<span class="yig-pop pill">${esc(text)}</span>`;
+  if (cls === "gname") return `<span class="yig-pop gname"><img src="icons/${ICON[text]}-icon.svg" alt=""><b>${esc(NAME[text])}</b></span>`;
   if (cls.startsWith("gicon")) return `<span class="yig-pop ${esc(cls)}"><img src="icons/${ICON[text]}-icon.svg" alt=""></span>`;
   const parts = cls.split(" "), outer = parts.filter((m) => /^[gw]\d+$/.test(m)).join(" "), inner = parts.filter((m) => !/^[gw]\d+$/.test(m)).join(" ");
   const lines = text.split("|");
@@ -434,7 +438,7 @@ addEventListener("keydown", (e) => {
 const SPLASH_TOP = 16, SPLASH_H = 330, SPLASH_LOCKUP_Y = 197, HOP_TOP_Y = 525, HOP_GAP = 28;
 function layoutSplash() {
   const root = document.documentElement.style;
-  if (innerWidth < 1025) { root.removeProperty("--sp-dy"); root.removeProperty("--sp-k"); return; }
+  root.removeProperty("--sp-dy"); root.removeProperty("--sp-k"); return;
   const r = document.getElementById("artboard").getBoundingClientRect();
   const hopTop = r.top + (HOP_TOP_Y / 1067) * r.height;
   const k = Math.max(0.5, Math.min(1, (hopTop - HOP_GAP - SPLASH_TOP) / SPLASH_H));
