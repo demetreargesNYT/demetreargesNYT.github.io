@@ -86,8 +86,10 @@ body.top-lockup .blk-icon { visibility: hidden; }
 .bart img { display: block; }
 .bart.conn img { width: 226px; height: 221px; }
 .bart.w5 { margin-top: 120px; } .bart.w5 img { width: 75px; height: 131.25px; }
-.badges { display: grid; grid-template-columns: repeat(3, 94px); gap: 16px 16px; width: 314px; margin-top: 16px; justify-content: center; }
-.badges i { display: block; width: 94px; height: 94px; border-radius: 50%; background: #E1DBF5; border: 1.5px solid #121212; }
+.badges { display: grid; grid-template-columns: repeat(3, 94px); grid-auto-rows: 111px; gap: 12px 16px; width: 314px; margin-top: 16px; justify-content: center; align-items: start; }
+.badges .bd { display: grid; justify-items: center; row-gap: 6px; width: 94px; }
+.badges .bd img { display: block; width: 75px; height: 75px; }
+.badges .bl { font: 500 13px / 1.15 "NYT Karnak", Georgia, serif; color: #121212; text-align: center; white-space: nowrap; }
 .blk-badges { left: 0; right: 0; }
 .pill { display: block; padding: 5px 10px; border: 1.5px solid #121212; border-radius: 4px; background: #FFF; font: 600 24px / 1.3 "NYT Karnak", Georgia, serif; }
 .blk-video { left: 48px; right: 48px; row-gap: 0; justify-items: start; text-align: left; }
@@ -369,6 +371,9 @@ const cards = buildCards();
 
 const esc = (v) => String(v).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
 const BUBBLE_SVG = `<svg width="286" height="159" viewBox="0 0 286 159" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="&#226;&#173;&#144;&#239;&#184;&#143; Latest"><g id="chapter-1-5--bot--anon"><g id="Group 1197145129"><g id="Frame 1664647303"><g id="Frame 1664647055"><rect x="1" y="1" width="284" height="134" rx="14" fill="white"/><rect x="1" y="1" width="284" height="134" rx="14" stroke="black" stroke-width="2"/></g><g id="Frame 1197145120"><g id="speech 1" clip-path="url(#clip0_9235_7244)"><path id="Vector" d="M-179.857 -178.611H160.795C168.023 -178.611 173.921 -172.86 173.921 -165.715V117.144C173.921 124.246 168.067 130.041 160.795 130.041H64.3906C64.3463 130.041 64.3463 130.041 64.3463 130.085C64.3463 138.189 67.3173 142.589 79.4233 148.428C79.4676 148.471 79.4676 148.515 79.4233 148.515C77.2504 148.951 52.1073 153.613 43.9036 130.085L43.8593 130.041H-179.813C-187.041 130.041 -192.939 124.29 -192.939 117.144V-165.715C-192.983 -172.816 -187.085 -178.611 -179.857 -178.611Z" fill="white" stroke="black" stroke-width="2" stroke-miterlimit="10"/></g></g></g></g></g></g><defs><clipPath id="clip0_9235_7244"><rect width="43.413" height="24.3994" fill="white" transform="matrix(-1 0 0 1 83.413 134)"/></clipPath></defs></svg>`;
+const BADGES = [["14-day-wordle-streak", "14-Day Wordle|Streak"], ["first-purple-first", "First Purple|First"], ["7-day-strands-streak", "7-Day Strands|Streak"],
+  ["10-geniuses", "10 Geniuses"], ["wordle-in-2", "Wordle In 2"], ["100-long-words", "100 Long|Words"],
+  ["1000-wordle-puzzles", "1000 Wordle|Puzzles"], ["1000-connections", "1000|Connections"], ["solved-without-hints", "Solved Without|Hints"]];
 function lineHtml([cls, text]) {
   if (cls.startsWith("panel")) return `<span class="yig-pop ${esc(cls)}">${esc(text)}</span>`;
   if (cls === "bubble") {
@@ -390,7 +395,7 @@ function lineHtml([cls, text]) {
   if (cls === "pangram") return `<span class="yig-pop pangram"><img src="assets/icon-pangram.svg" alt=""></span>`;
   if (cls.startsWith("rank")) return `<span class="yig-pop rank ${cls.includes("n4") ? "n4 " : ""}${text === "GENIUS" ? "genius" : "queen"}"><img src="assets/icon-${text === "GENIUS" ? "genius" : "queen-bee"}.svg" alt=""></span>`;
   if (cls.startsWith("bart")) return `<span class="yig-pop ${esc(cls)}"><img src="assets/badge-${cls.includes("conn") ? "connections-1000" : "wordle-5"}.svg" alt=""></span>`;
-  if (cls === "badges") return `<span class="yig-pop badges">${"<i></i>".repeat(12)}</span>`;
+  if (cls === "badges") return `<span class="yig-pop badges">${BADGES.map(([f, label]) => `<span class="bd"><img src="assets/badge-${f}.svg" alt=""><span class="bl">${label.split("|").map(esc).join("<br>")}</span></span>`).join("")}</span>`;
   if (cls === "pill") return `<span class="yig-pop pill">${esc(text)}</span>`;
   if (cls === "gname" || cls === "gname-top") return `<span class="yig-pop ${cls}"><img src="assets/lockup-${text}.svg" alt="${esc(NAME[text])}"></span>`;
   if (cls.startsWith("gicon")) return `<span class="yig-pop ${esc(cls)}"><img src="icons/${ICON[text]}-icon.svg" alt=""></span>`;
