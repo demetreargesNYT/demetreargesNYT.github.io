@@ -1,10 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="fonts-wait">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Year in Games 2026 · preview</title>
 <link rel="icon" href="data:,">
+<link rel="preload" as="font" type="font/woff2" href="fonts/nyt-franklin-500.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/nyt-franklin-600.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/nyt-franklin-700.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/nyt-karnak-500.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/nyt-karnak-600.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/nyt-karnak-700.woff2" crossorigin>
 
 
 <script>{ const q = new URLSearchParams(location.search), rt = q.get("runtime") || "2.34.0", fin = q.get("finesse") === "1";
@@ -89,6 +95,10 @@ body.top-lockup .blk-icon { visibility: hidden; }
 .blk-video .pill + .pill { margin-top: -1.5px; }
 .login { display: block; font: 500 16px / 20px "NYT Franklin", Arial, sans-serif; color: #363636; text-decoration: underline; text-align: center; white-space: nowrap; margin-top: 4px; }
 body.anon-start .splash-support { top: 531px; }
+
+html.flow-anon .splash, html.flow-anon .blk-start, html.flow-anon .blk-loader { transform: translateY(-22px); }
+
+html.fonts-wait .overlay { visibility: hidden; }
 .blk-end { top: 202px; } .blk-end-anon { top: 249px; }
 .blk-end-anon, .blk-end { row-gap: 24px; }
 .btn.wide { width: 241px; margin-top: 8px; }
@@ -169,8 +179,15 @@ body.html-off .yig-column, body.html-off .yig-arrow, body.html-off .video-bg { v
 .yig-how-to { z-index: 30; pointer-events: none; visibility: hidden; }
 .yig-how-to[data-showing="1"] { visibility: visible; }
 .curtain { position: fixed; inset: 0; z-index: 9; background: #F1ECC0; display: grid; place-items: center; font: 600 14px "NYT Franklin", Arial, sans-serif; }
-.rive-only-pill { display: none !important; }
 </style>
+<script>if (new URLSearchParams(location.search).get("flow") === "anon") document.documentElement.classList.add("flow-anon");
+{
+  const faces = ["500 18px 'NYT Franklin'", "600 18px 'NYT Franklin'", "700 18px 'NYT Franklin'", "500 24px 'NYT Karnak'", "600 24px 'NYT Karnak'", "700 24px 'NYT Karnak'"];
+  const lift = () => document.documentElement.classList.remove("fonts-wait");
+  setTimeout(lift, 3000);
+  addEventListener("DOMContentLoaded", () => Promise.all(faces.map((f) => document.fonts.load(f))).then(() => document.fonts.ready).then(lift, lift));
+}
+</script>
 </head>
 <body class="on-splash">
 <div class="yig-background"><div class="yig-artboard" id="artboard"></div></div>
