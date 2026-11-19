@@ -48,16 +48,17 @@ body { font: 500 14px/1.4 "NYT Franklin", "Helvetica Neue", Arial, sans-serif; }
 .t-icon img { width: 50px; height: auto; display: block; }
 
 .gicon img { width: 50px; height: auto; display: block; margin-bottom: -4px; }
-.gname { display: grid; justify-items: center; row-gap: 8px; }
-.gname img { width: 50px; height: auto; display: block; }
-.gname b { font: 700 18px / 1.2 "NYT Franklin", Arial, sans-serif; }
+.gname img { height: 91.2px; width: auto; display: block; }
+.gname-top img { height: 127.7px; width: auto; display: block; }
+body.top-lockup .blk-icon { visibility: hidden; }
+.blk-copy.after-icon-slot.blk-toplockup { top: var(--yig-copy-top); }
 .gicon-first img { width: 91px; height: auto; display: block; }
 .wgrid { display: grid; row-gap: 10px; }
-.wrow { display: flex; gap: 4px; justify-content: center; }
-.wrow i { display: grid; place-items: center; width: 48px; height: 50px; font: 700 28px / 1 "NYT Franklin", Arial, sans-serif; font-style: normal; color: #FFF; }
-.wrow i.g { background: #6AAA64; } .wrow i.y { background: #C9B458; } .wrow i.n { background: #787C7E; }
+.wrow { display: flex; gap: 3.062px; justify-content: center; }
+.wrow i { display: grid; place-items: center; box-sizing: border-box; width: 49.152px; height: 47.55px; border: 1.5px solid #121212; font: 700 32.056px / 1 "NYT Franklin", Arial, sans-serif; font-style: normal; text-transform: uppercase; }
+.wrow i.green { background: #6AAA64; color: #FFF; } .wrow i.white { background: #FFF; color: #121212; }
 .ctiles { display: grid; row-gap: 10px; width: 155px; }
-.ctiles i { display: block; height: 40px; border-radius: 4px; }
+.ctiles i { display: grid; place-items: center; box-sizing: border-box; height: 40px; border: 1.5px solid #121212; border-radius: 8.75px; font: 700 24px / 1 "NYT Franklin", Arial, sans-serif; font-style: normal; color: #121212; }
 .hist, .hist.g24 { display: flex; align-items: flex-end; justify-content: space-between; width: 272px; height: 146px; }
 .hist i { display: block; width: 28px; background: #121212; border-radius: 2px 2px 0 0; }
 .honey { display: flex; gap: 6px; justify-content: center; align-items: center; width: 288px; height: 81px; }
@@ -211,13 +212,13 @@ const TOP = FLOW === "anon" ? "wordle" : (q.get("top") || own[0] || "wordle");
 
 const c = (file, scene, chapter, copy, extra = {}) => ({ file, scene, chapter, copy, ...extra });
 const H = (t, x = "") => ["t-serif" + x, t], S = (t) => ["t-big", t], B = (t, x = "") => ["t-small" + x, t];
-const WG = (w) => ["wgrid", w], GI = (g, size = "") => ["gicon" + size, g];
+const WG = (w, tone = "white") => ["wgrid " + tone, w], GI = (g, size = "") => ["gicon" + size, g];
 const GAME_CARDS = {
   wordle: [
     [H("On average, you solved|Wordle puzzles in"), S("X guesses"), B("The average across all solvers was|4.27 guesses. Well played!")],
     [H("Your best solves took"), S("X guesses"), H("which you did"), S("X times"), B("Luck. Skill. What a thrill.")],
-    [H("The hardest word of the year was"), WG("PSHAW"), B("28% of players were stumped|on May 14, including you!")],
-    [H("And your top|starting words were"), WG("ADIEU,AROSE,RAISE"), B("Look at you, making the first move.", " g24")],
+    [H("The hardest word of the year was"), WG("PSHAW", "green"), B("28% of players were stumped|on May 14, including you!")],
+    [H("And your top|starting words were"), WG("ADIEU,BREAD,MOUSE"), B("Look at you, making the first move.", " g24")],
   ],
   connections: [
     [H("In Connections, your most common solving order was"), ["ctiles", ""]],
@@ -276,7 +277,7 @@ function buildCards() {
     ? [[H("In 2026, you brought|your best game.", " lg")],
        [H("Together, you all completed"), S("10.54 billion puzzles"), B("That’s some serious puzzle power.")],
        [H("The most popular Wordle|starting word was"), WG("ADIEU"), B("Oh là là!")],
-       [H("And the word that stumped|the most players was"), WG("PSHAW"), B("Plenty of streaks wavered on May 14, too.")],
+       [H("And the word that stumped|the most players was"), WG("PSHAW", "green"), B("Plenty of streaks wavered on May 14, too.")],
        BOT]
     : [[H("This year, you turned|downtime into playtime.")],
        [H("You played a total of"), S("X puzzles"), B("Cheers, super solver.")],
@@ -311,7 +312,7 @@ function buildCards() {
     if (PLAYER.achievements > 0) out.push(c(3, "chapter-3-personal-badges", "", [H("You also earned new badges.|And bragging rights."), ["badges", ""]], { slot: "badges" }));
   }
   out.push(c(3, "chapter-4", "Chapter 4", [anon ? H("But in the end, it’s clear|you all play favorites.") : H("But through it all, it’s clear|you play favorites.")], { topGame: TOP, reveal: false }));
-  out.push(c(3, "chapter-4-top-game", "", [H(anon ? "The top game of 2026 was..." : "In 2026, your top game was..."), S(NAME[TOP])], { icon: TOP, reveal: true }));
+  out.push(c(3, "chapter-4-top-game", "", [H(anon ? "The top game of 2026 was..." : "In 2026, your top game was..."), ["gname-top", TOP]], { icon: TOP, reveal: true, slot: "toplockup" }));
   out.push(c(3, "chapter-4-editor-video", "Video", anon
     ? [["panel panel-video", "VIDEO FROM ALL THE EDITORS · SAMPLE"]]
     : [["panel panel-video", `${NAME[TOP].toUpperCase()} VIDEO · SAMPLE`], ["pill", "Tracy Bennett"], ["pill", `Editor of ${NAME[TOP]}`]], { kind: "video", reveal: true, bg: WALL[TOP], slot: "video" }));
@@ -335,18 +336,18 @@ function lineHtml([cls, text]) {
   if (cls === "login") return `<span class="yig-pop login">Already a subscriber? <u>Log In</u></span>`;
   if (cls === "icons") return `<span class="yig-pop icons">${text.split(",").map((g) => `<img src="icons/${ICON[g]}-icon.svg" alt="">`).join("")}</span>`;
   if (cls === "loader") return `<span class="yig-pop loader"><span id="loader-fill"></span></span>`;
-  if (cls === "wgrid") {
-    const tone = ["g", "y", "n", "g", "g"];
-    return `<span class="yig-pop wgrid">${text.split(",").map((w) => `<span class="wrow">${[...w].map((ch, i) => `<i class="${tone[i % 5]}">${esc(ch)}</i>`).join("")}</span>`).join("")}</span>`;
+  if (cls.startsWith("wgrid")) {
+    const tone = cls.includes("green") ? "green" : "white";
+    return `<span class="yig-pop wgrid">${text.split(",").map((w) => `<span class="wrow">${[...w].map((ch) => `<i class="${tone}">${esc(ch)}</i>`).join("")}</span>`).join("")}</span>`;
   }
-  if (cls === "ctiles") return `<span class="yig-pop ctiles"><i style="background:#F9DF6D"></i><i style="background:#A0C35A"></i><i style="background:#B0C4EF"></i><i style="background:#BA81C5"></i></span>`;
+  if (cls === "ctiles") return `<span class="yig-pop ctiles">${[["BLUE", "#B0C4ED"], ["GREEN", "#A0C35A"], ["YELLOW", "#F9DF6D"], ["PURPLE", "#BC70C4"]].map(([n, c]) => `<i style="background:${c}">${n}</i>`).join("")}</span>`;
   if (cls.startsWith("hist")) return `<span class="yig-pop ${esc(cls)}">${[40, 62, 90, 124, 100, 70, 46].map((h) => `<i style="height:${h}px"></i>`).join("")}</span>`;
   if (cls === "honey") return `<span class="yig-pop honey">${"<i></i>".repeat(7)}</span>`;
   if (cls === "pangram") return `<span class="yig-pop pangram"></span>`;
   if (cls === "rank") return `<span class="yig-pop rank">${esc(text)}</span>`;
   if (cls === "badges") return `<span class="yig-pop badges">${"<i></i>".repeat(12)}</span>`;
   if (cls === "pill") return `<span class="yig-pop pill">${esc(text)}</span>`;
-  if (cls === "gname") return `<span class="yig-pop gname"><img src="icons/${ICON[text]}-icon.svg" alt=""><b>${esc(NAME[text])}</b></span>`;
+  if (cls === "gname" || cls === "gname-top") return `<span class="yig-pop ${cls}"><img src="assets/lockup-${text}.svg" alt="${esc(NAME[text])}"></span>`;
   if (cls.startsWith("gicon")) return `<span class="yig-pop ${esc(cls)}"><img src="icons/${ICON[text]}-icon.svg" alt=""></span>`;
   const parts = cls.split(" "), outer = parts.filter((m) => /^[gw]\d+$/.test(m)).join(" "), inner = parts.filter((m) => !/^[gw]\d+$/.test(m)).join(" ");
   const lines = text.split("|");
@@ -475,6 +476,7 @@ const videoBg = document.getElementById("video-bg");
 setInterval(() => {
   document.body.classList.toggle("on-splash", state().frame <= 1);
   progress.style.width = `${(100 * state().frame) / (cards.length - 1)}%`;
+  document.body.classList.toggle("top-lockup", cards[state().frame]?.scene === "chapter-4-top-game");
   document.body.classList.toggle("anon-start", FLOW === "anon" && state().frame === 1);
   const k = cards[state().frame];
   if (k.bg) videoBg.style.background = k.bg;
