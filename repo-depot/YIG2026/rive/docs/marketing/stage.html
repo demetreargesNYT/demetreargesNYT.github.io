@@ -91,6 +91,7 @@ body.anon-start .splash-support { top: 531px; }
 .blk-end { top: 202px; } .blk-end-anon { top: 249px; }
 .blk-end-anon, .blk-end { row-gap: 24px; }
 .btn.wide { width: 241px; margin-top: 8px; }
+.btn.full { width: 100%; margin-top: 8px; }
 .btn { display: inline-grid; place-items: center; margin-top: 18px; width: 196px; height: 48px; border-radius: 999px; background: #000; color: #FFF;
   font: 600 16px / 1 "NYT Franklin", Arial, sans-serif; }
 
@@ -327,7 +328,7 @@ function buildCards() {
   }
   if (anon) {
     out.push(c(3, "chapter-3", "Chapter 3", [H("There’s plenty more to|celebrate, too.", " lg")]));
-    out.push(c(3, "chapter-3-2", "", [["icons", "connections,crossword,midi"], H("Crossplay, the Midi and|bonus puzzles introduced new|ways to play."), ["btn", "Download Crossplay app"]]));
+    out.push(c(3, "chapter-3-2", "", [["icons", "connections,crossword,midi"], H("Crossplay, the Midi and|bonus puzzles introduced|new ways to play."), ["btn full", "Download Crossplay app"]]));
     out.push(c(3, "chapter-3-event-badges", "", [["bart conn", ""], H("Connections hit|1000 puzzles.", " lg")]));
     out.push(c(3, "chapter-3-event-badges", "", [["bart w5", ""], H("And Wordle turned|5 and fabulous.", " lg")]));
   } else {
