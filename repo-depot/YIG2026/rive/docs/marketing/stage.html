@@ -40,9 +40,11 @@ body { font: 500 14px/1.4 "NYT Franklin", "Helvetica Neue", Arial, sans-serif; }
 .t-serif { font: 500 24px / 1.2 "NYT Karnak", Georgia, serif; }
 .t-serif.lg { font-size: 26px; }
 .t-big { font: 600 28px / normal "NYT Karnak", Georgia, serif; }
+.t-small.s20 { font-size: 20px; }
 .t-small { font: 500 18px / 1.2 "NYT Franklin", Arial, sans-serif; }
 .t-multi { display: grid; justify-items: center; }
 .g24 { margin-top: 8px; }
+.rank.n4 { margin-top: -4px; } .yig-mask.n4 { margin-top: calc(-4px - .08em); }
 .g56 { margin-top: 40px; }
 .w206 { max-width: 206px; } .w227 { max-width: 227px; } .w311 { max-width: 311px; } .w273 { max-width: 273px; } .w335 { max-width: 335px; }
 .t-icon img { width: 50px; height: auto; display: block; }
@@ -85,8 +87,7 @@ body.top-lockup .blk-icon { visibility: hidden; }
 .blk-video { left: 48px; right: 48px; row-gap: 0; justify-items: start; text-align: left; }
 .blk-video .panel-video { width: 279px; height: 497px; margin: 0 0 21px; }
 .blk-video .pill + .pill { margin-top: -1.5px; }
-.login { display: block; font: 500 16px / 1.2 "NYT Franklin", Arial, sans-serif; margin-top: 4px; }
-.login u { text-decoration: underline; }
+.login { display: block; font: 500 16px / 20px "NYT Franklin", Arial, sans-serif; color: #363636; text-decoration: underline; text-align: center; white-space: nowrap; margin-top: 4px; }
 body.anon-start .splash-support { top: 531px; }
 .blk-end { top: 202px; } .blk-end-anon { top: 249px; }
 .blk-end-anon, .blk-end { row-gap: 24px; }
@@ -136,12 +137,12 @@ body.on-splash .nav-logo, body.on-splash .nav-progress { opacity: 0; }
   font: 700 calc(16 * var(--u)) / 1.3 "NYT Franklin", Arial, sans-serif; padding: calc(16 * var(--u)); }
 .panel-video { height: calc(420 * var(--u)); width: calc(240 * var(--u)); background: rgba(31, 31, 31, .82); color: #FFF; border-color: #FFF; }
 
-.blk-bubble { left: var(--bub-left, 47px); right: auto; top: var(--bub-top, 140px); width: 280px; justify-items: stretch; text-align: left;
-  transform: scale(var(--bub-k, 1)); transform-origin: var(--bub-tail-x, 100px) calc(100% + 20px); }
-.bubble { position: relative; box-sizing: border-box; width: 280px; padding: 24px; background: #FFF; border: 2px solid #1F1F1F; border-radius: 14px;
-  font: 500 16px / 1.38 "NYT Franklin", Arial, sans-serif; color: #121212; }
+.blk-bubble { left: var(--bub-left, 49px); right: auto; top: var(--bub-top, 209px); width: 286px; justify-items: stretch; text-align: left;
+  transform: scale(var(--bub-k, 1)); transform-origin: var(--bub-tail-x, 48px) 100%; }
+.bubble { position: relative; display: block; width: 286px; height: 159px; color: #000; }
+.bubble > svg { position: absolute; left: 0; top: 0; display: block; }
+.bubble .btext { position: absolute; left: 24px; top: 24px; width: 238px; font: 500 18px / 1.2 "NYT Franklin", Arial, sans-serif; white-space: nowrap; }
 .bubble b { font-weight: 700; }
-.bubble svg { position: absolute; top: 100%; left: calc(var(--bub-tail-x, 100px) - 2px - 22px); display: block; overflow: visible; }
 
 .yig-tap { position: fixed; top: 0; bottom: 0; z-index: 2; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -247,7 +248,7 @@ const GAME_CARDS = {
     [H("In Spelling Bee, you found|a total of"), S("X words"), B("Honey, what an accomplishment.")],
     [H("Your longest word was"), ["honey", ""], B("The longest words in any puzzle this year|were CATALYTICALLY, INTELLIGENTLY and|CONTAMINATION.")],
     [H("You also found"), ["pangram", ""], S("X pangrams"), B("Hive fives, all around.")],
-    [H("And you reached Genius"), ["rank", "GENIUS"], S("X times"), H("and Queen Bee"), ["rank", "QUEEN BEE"], S("X times"), B("Sweet, sweet victory.")],
+    [H("And you reached Genius"), ["rank n4", "GENIUS"], S("X times"), H("and Queen Bee", " n4"), ["rank n4", "QUEEN BEE"], S("X times"), B("Sweet, sweet victory.", " n4")],
   ],
   mini: [
     [H("For the Mini,|you solved a total of"), S("X puzzles"), B("Small grid, big win.")],
@@ -281,13 +282,13 @@ GAME_ALL.wordle.splice(3, 0,
 GAME_ALL["spelling-bee"].splice(2, 0, [H("Your longest word was"), ["honey", ""], B("It was also one of the longest words in any|puzzle this year!")]);
 GAME_ALL["spelling-bee"].push([H("And you reached [Rank]"), S("X times"), B("Sweet!")]);
 GAME_ALL.strands.splice(3, 0, [H("You used hints"), S("X% of time"), B("Teamwork makes the theme work!|On average, solvers used 1.71 hints|per puzzle this year.")]);
-const SUBSCRIBE = B("Subscribe for full access|to all of our games.", " g56");
+const SUBSCRIBE = B("Subscribe for full access|to all of our games.", " s20 g56");
 const COMMUNITY = {
-  connections: (anon) => [H(anon ? "A picture-only Connections puzzle|stumped" : "In Connections, a picture-only|puzzle stumped"), S("41% of players"), B("February 7. What a day.")],
+  connections: (anon) => [H(anon ? "A picture-only Connections|puzzle stumped" : "In Connections, a picture-only|puzzle stumped"), S("41% of players"), B("February 7. What a day.")],
   "spelling-bee": (anon) => [H("The August 26|Spelling Bee puzzle gave us"), S("930,168 Geniuses"), B("Hive fives, all around."), ...(anon ? [SUBSCRIBE] : [])],
   mini: (anon) => [H("Half of players solved|the Mini in under"), S("100 seconds"), B("Speedsters unite."), ...(anon ? [SUBSCRIBE] : [])],
   strands: (anon) => [H(anon ? "And in Strands," : "In Strands,"), S("23.3 million players"), H("solved a puzzle without hints."), B("A-maze-ing.", " g24")],
-  wordle: () => [H("In Wordle, the most popular|starting word was"), WG("ADIEU"), B("Oh là là!")],
+  wordle: () => [H("In Wordle, the most popular|starting word was"), WG("ADIEU", "green"), B("Oh là là!")],
 };
 function buildCards() {
   const anon = FLOW === "anon";
@@ -296,12 +297,12 @@ function buildCards() {
     c(1, "start", "Start", anon ? [["btn", "Let’s go"], ["login", ""]] : [["btn", "Let’s go"]], { slot: "start" }),
     c(1, "ad", "Ad 1", [], { ad: true }),
   ];
-  const BOT = [["bubble", "Did you know: Over 1.9 million players achieved 100-day Wordle streaks this year. That’s a lot, even for this clever bot!"]];
+  const BOT = [["bubble", "Did you know: Over 1.9 million|players achieved 100-day|Wordle streaks this year. That’s|a lot, even for this clever bot!"]];
   const ch1 = anon
     ? [[H("In 2026, you brought|your best game.", " lg")],
        [H("Together, you all completed"), S("10.54 billion puzzles"), B("That’s some serious puzzle power.")],
-       [H("The most popular Wordle starting|word was"), WG("ADIEU"), B("Oh là là!")],
-       [H("And the word that stumped the|most players was"), WG("PSHAW", "green"), B("Plenty of streaks wavered on May 14, too.")],
+       [H("The most popular Wordle starting|word was"), WG("ADIEU", "green"), B("Oh là là!")],
+       [H("And the word that stumped the|most players was"), WG("WAVER", "green"), B("Plenty of streaks wavered on May 14, too.")],
        BOT]
     : [[H("This year, you turned|downtime into playtime.")],
        [H("You played a total of"), S("X puzzles"), B("Cheers, super solver.")],
@@ -350,15 +351,16 @@ function buildCards() {
 const cards = buildCards();
 
 const esc = (v) => String(v).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
+const BUBBLE_SVG = `<svg width="286" height="159" viewBox="0 0 286 159" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="&#226;&#173;&#144;&#239;&#184;&#143; Latest"><g id="chapter-1-5--bot--anon"><g id="Group 1197145129"><g id="Frame 1664647303"><g id="Frame 1664647055"><rect x="1" y="1" width="284" height="134" rx="14" fill="white"/><rect x="1" y="1" width="284" height="134" rx="14" stroke="black" stroke-width="2"/></g><g id="Frame 1197145120"><g id="speech 1" clip-path="url(#clip0_9235_7244)"><path id="Vector" d="M-179.857 -178.611H160.795C168.023 -178.611 173.921 -172.86 173.921 -165.715V117.144C173.921 124.246 168.067 130.041 160.795 130.041H64.3906C64.3463 130.041 64.3463 130.041 64.3463 130.085C64.3463 138.189 67.3173 142.589 79.4233 148.428C79.4676 148.471 79.4676 148.515 79.4233 148.515C77.2504 148.951 52.1073 153.613 43.9036 130.085L43.8593 130.041H-179.813C-187.041 130.041 -192.939 124.29 -192.939 117.144V-165.715C-192.983 -172.816 -187.085 -178.611 -179.857 -178.611Z" fill="white" stroke="black" stroke-width="2" stroke-miterlimit="10"/></g></g></g></g></g></g><defs><clipPath id="clip0_9235_7244"><rect width="43.413" height="24.3994" fill="white" transform="matrix(-1 0 0 1 83.413 134)"/></clipPath></defs></svg>`;
 function lineHtml([cls, text]) {
   if (cls.startsWith("panel")) return `<span class="yig-pop ${esc(cls)}">${esc(text)}</span>`;
   if (cls === "bubble") {
     const [lead, ...rest] = text.split(":");
-    return `<span class="yig-pop bubble"><b>${esc(lead)}:</b>${esc(rest.join(":"))}<svg width="26" height="22" viewBox="0 0 26 22" aria-hidden="true">`
-      + `<path d="M0 0 L22 22 L18 0" fill="#FFF" stroke="#1F1F1F" stroke-width="2" stroke-linejoin="round"/><path d="M1.5 1 H17" stroke="#FFF" stroke-width="2.6"/></svg></span>`;
+    const lines = (lead + ":" + rest.join(":")).split("|").map((l, n) => (n === 0 ? `<b>${esc(l.slice(0, lead.length + 1))}</b>${esc(l.slice(lead.length + 1))}` : esc(l)));
+    return `<span class="yig-pop bubble">${BUBBLE_SVG}<span class="btext">${lines.join("<br>")}</span></span>`;
   }
   if (cls.startsWith("btn")) return `<span class="yig-pop ${esc(cls)}">${esc(text)}</span>`;
-  if (cls === "login") return `<span class="yig-pop login">Already a subscriber? <u>Log In</u></span>`;
+  if (cls === "login") return `<span class="yig-pop login">Have an account? Log in<br>for personalized stats.</span>`;
   if (cls === "icons") return `<span class="yig-pop icons"><img class="i1" src="assets/icon-crossplay.svg" alt=""><img class="i2" src="assets/icon-midi-2027.svg" alt=""><img class="i3" src="assets/icon-bonus-puzzles.svg" alt=""></span>`;
   if (cls === "loader") return `<span class="yig-pop loader"><span id="loader-fill"></span></span>`;
   if (cls.startsWith("wgrid")) {
@@ -369,13 +371,13 @@ function lineHtml([cls, text]) {
   if (cls.startsWith("hist")) return `<span class="yig-pop ${esc(cls)}">${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((d) => `<span class="hrow"><span class="hlab"><b>${d}</b><span>12</span></span><span class="htrack"><i></i></span></span>`).join("")}</span>`;
   if (cls === "honey") return `<span class="yig-pop honey"><img src="assets/honeycomb.svg" alt=""><span>${esc(text || "TKTKTKTK")}</span></span>`;
   if (cls === "pangram") return `<span class="yig-pop pangram"><img src="assets/icon-pangram.svg" alt=""></span>`;
-  if (cls === "rank") return `<span class="yig-pop rank ${text === "GENIUS" ? "genius" : "queen"}"><img src="assets/icon-${text === "GENIUS" ? "genius" : "queen-bee"}.svg" alt=""></span>`;
+  if (cls.startsWith("rank")) return `<span class="yig-pop rank ${cls.includes("n4") ? "n4 " : ""}${text === "GENIUS" ? "genius" : "queen"}"><img src="assets/icon-${text === "GENIUS" ? "genius" : "queen-bee"}.svg" alt=""></span>`;
   if (cls.startsWith("bart")) return `<span class="yig-pop ${esc(cls)}"><img src="assets/badge-${cls.includes("conn") ? "connections-1000" : "wordle-5"}.svg" alt=""></span>`;
   if (cls === "badges") return `<span class="yig-pop badges">${"<i></i>".repeat(12)}</span>`;
   if (cls === "pill") return `<span class="yig-pop pill">${esc(text)}</span>`;
   if (cls === "gname" || cls === "gname-top") return `<span class="yig-pop ${cls}"><img src="assets/lockup-${text}.svg" alt="${esc(NAME[text])}"></span>`;
   if (cls.startsWith("gicon")) return `<span class="yig-pop ${esc(cls)}"><img src="icons/${ICON[text]}-icon.svg" alt=""></span>`;
-  const parts = cls.split(" "), outer = parts.filter((m) => /^[gw]\d+$/.test(m)).join(" "), inner = parts.filter((m) => !/^[gw]\d+$/.test(m)).join(" ");
+  const parts = cls.split(" "), outer = parts.filter((m) => /^[gwn]\d+$/.test(m)).join(" "), inner = parts.filter((m) => !/^[gwn]\d+$/.test(m)).join(" ");
   const lines = text.split("|");
   const one = (t, o) => `<span class="yig-mask ${o}"><span class="yig-line ${esc(inner)}">${esc(t)}</span></span>`;
   return lines.length > 1 ? `<span class="t-multi ${outer}">${lines.map((t) => one(t, "")).join("")}</span>` : one(text, outer);
@@ -477,25 +479,27 @@ addEventListener("load", layoutSplash);
 layoutSplash();
 setTimeout(layoutSplash, 300);
 
-const BOT_HEAD_X = 755.7, BOT_HEAD_Y = 376.5, BUB_LEFT = 140.4, BUB_ABOVE = 174, BUB_TAIL_X = 78, BUB_TAIL = 20, BUB_TOP_MIN = 142;
+const BOT_HEAD_X = 755.7, BOT_HEAD_Y = 376.5, BUB_LEFT = 146.7, BUB_ABOVE = 167.5, BUB_TAIL_X = 48, BUB_W = 286, BUB_H = 159, BUB_TOP_MIN = 142;
 function layoutBubble() {
   const blk = document.querySelector(".blk-bubble");
-  if (!blk || blk.hidden) return;
+  if (!blk) return;
   const r = document.getElementById("artboard").getBoundingClientRect();
-  const col = blk.offsetParent.getBoundingClientRect();
+  const col = document.getElementById("overlay").getBoundingClientRect();
   const hx = r.left + (BOT_HEAD_X / 1495) * r.width - col.left, hy = r.top + (BOT_HEAD_Y / 1067) * r.height - col.top;
-  const w = blk.offsetWidth, h = blk.offsetHeight;
-  const left = Math.max(8, Math.min(col.width - w - 8, hx - BUB_LEFT));
-  const tail = Math.max(30, Math.min(w - 30, hx - BUB_LEFT + BUB_TAIL_X - left));
-  const top = hy - BUB_ABOVE, tip = top + h + BUB_TAIL;
-  const k = top < BUB_TOP_MIN ? Math.max(0.6, (tip - BUB_TOP_MIN) / (h + BUB_TAIL)) : 1;
+  const left = Math.max(8, Math.min(col.width - BUB_W - 8, hx - BUB_LEFT));
+  const top = hy - BUB_ABOVE, tip = top + BUB_H;
+  const k = top < BUB_TOP_MIN ? Math.max(0.6, (tip - BUB_TOP_MIN) / BUB_H) : 1;
   const s = blk.style;
   s.setProperty("--bub-left", `${left.toFixed(1)}px`);
   s.setProperty("--bub-top", `${top.toFixed(1)}px`);
-  s.setProperty("--bub-tail-x", `${tail.toFixed(1)}px`);
+  s.setProperty("--bub-tail-x", `${BUB_TAIL_X}px`);
   s.setProperty("--bub-k", k.toFixed(4));
 }
 addEventListener("resize", layoutBubble);
+addEventListener("load", layoutBubble);
+layoutBubble();
+setTimeout(layoutBubble, 300);
+document.fonts?.ready.then(layoutBubble);
 
 const progress = document.getElementById("progress");
 const videoBg = document.getElementById("video-bg");
