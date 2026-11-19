@@ -149,13 +149,13 @@ const q = new URLSearchParams(location.search);
 let FLOW = q.get("flow") === "anon" ? "anon" : "sub";
 
 const PLAYERS = {
-  "wordle-only": { completed: { wordle: 212, connections: 7, mini: 3 }, events: 5, achievements: 9 },
-  "midi-only": { completed: { midi: 40, crossword: 4 }, events: 3, achievements: 0 },
-  "connections-only": { completed: { wordle: 4, connections: 120, strands: 2 }, events: 0, achievements: 3 },
-  "all-seven": { completed: { wordle: 212, connections: 140, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, events: 0, achievements: 0 },
-  "all-seven-short": { completed: { wordle: 212, connections: 140, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, events: 5, achievements: 9, firstCardOnly: true },
-  "several-games": { completed: { wordle: 212, connections: 7, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, events: 0, achievements: 14 },
-  "none": { completed: { wordle: 3, connections: 2 }, events: 0, achievements: 0 },
+  "wordle-only": { completed: { wordle: 212, connections: 7, mini: 3 }, achievements: 9 },
+  "midi-only": { completed: { midi: 40, crossword: 4 }, achievements: 0 },
+  "connections-only": { completed: { wordle: 4, connections: 120, strands: 2 }, achievements: 3 },
+  "all-seven": { completed: { wordle: 212, connections: 140, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, achievements: 0 },
+  "all-seven-short": { completed: { wordle: 212, connections: 140, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, achievements: 9, firstCardOnly: true },
+  "several-games": { completed: { wordle: 212, connections: 7, strands: 30, "spelling-bee": 64, mini: 50, midi: 40, crossword: 90 }, achievements: 14 },
+  "none": { completed: { wordle: 3, connections: 2 }, achievements: 0 },
 };
 const WALL = { wordle: "#C3E2C0", connections: "#E1DBF5", strands: "#DFF3F0", "spelling-bee": "#FFFDEF", mini: "#C0D8F8", midi: "#7EAAF1", crossword: "#6493E6" };
 const PLAYER = PLAYERS[q.get("player")] ?? PLAYERS["wordle-only"];
@@ -218,7 +218,6 @@ function buildCards() {
     out.push(c(3, "chapter-3", "Chapter 3", [["t-serif", "There’s plenty more to celebrate, too."]]));
     out.push(c(3, "chapter-3-2", "", [["t-serif", "Crossplay, the Midi and bonus puzzles gave you new ways to play."]]));
     if (PLAYER.achievements > 0) out.push(c(3, "chapter-3-personal-badges", "", [["t-serif", "You also earned new badges"], ["panel", `${PLAYER.achievements} PERSONAL BADGES · HTML · SAMPLE`]]));
-    if (PLAYER.events > 0) out.push(c(3, "chapter-3-event-badges", "", [["t-serif", "And bragging rights."], ["panel", `${PLAYER.events} EVENT BADGES · HTML · SAMPLE`]]));
   }
   out.push(c(3, "chapter-4", "Chapter 4", [["t-serif", anon ? "But through it all, it’s clear everyone plays favorites." : "But through it all, it’s clear you play favorites."]], { topGame: TOP, reveal: false }));
   out.push(c(3, "chapter-4-top-game", "", [["t-serif", anon ? "In 2026, everyone’s top game was…" : "In 2026, your top game was…"], ["t-big", NAME[TOP]]], { icon: TOP, reveal: true }));

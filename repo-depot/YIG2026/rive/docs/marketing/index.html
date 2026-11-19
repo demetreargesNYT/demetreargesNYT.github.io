@@ -112,8 +112,8 @@ body { background: var(--paper); color: var(--ink); font: 500 13px/1.3 var(--ui)
   <h1>Year in Games 2026 · full experience</h1>
   <label>Flow <select id="flow"><option value="sub">Subscriber / registered</option><option value="anon">Anon</option></select></label>
   <label id="player-wrap">Player <select id="player">
-    <option value="wordle-only">Wordle only (Chapter 2.5; both badge cards)</option>
-    <option value="midi-only">Midi only (all five community cards; event badges only)</option>
+    <option value="wordle-only">Wordle only (Chapter 2.5; personal badges)</option>
+    <option value="midi-only">Midi only (all five community cards; no badge cards)</option>
     <option value="several-games">Several games (no 2.5; personal badges only)</option>
     <option value="all-seven">All seven games (no badge cards)</option>
     <option value="all-seven-short">All seven games (Chapter 2 short)</option>
@@ -304,7 +304,6 @@ const SCENES = [
   { group: "Chapter 3 (File 3)", label: "Chapter 3 opener", goto: "3:chapter-3" },
   { group: "Chapter 3 (File 3)", label: "New ways to play", goto: "3:chapter-3-2", flow: "sub" },
   { group: "Chapter 3 (File 3)", label: "Personal badges", goto: "3:chapter-3-personal-badges", flow: "sub", player: "wordle-only" },
-  { group: "Chapter 3 (File 3)", label: "Event badges", goto: "3:chapter-3-event-badges", flow: "sub", player: "wordle-only" },
   { group: "Chapter 3 (File 3)", label: "Anon: Connections hit 1000", goto: "3:chapter-3-event-badges", flow: "anon" },
   { group: "Chapter 3 (File 3)", label: "Anon: Wordle turned 5", goto: "3:chapter-3-event-badges:2", flow: "anon" },
   { group: "Chapter 4 (File 3)", label: "Chapter 4 opener", goto: "3:chapter-4", flow: "sub" },

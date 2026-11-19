@@ -227,7 +227,7 @@ function buildCards(kind) {
   if (kind === "anon") { community("wordle").forEach(comm); add(2, "to-chapter-3", "Ad 3", { ad: true }); }
   add(3, "chapter-3", "chapter-3"); add(3, "chapter-3-2", "chapter-3-2");
   if (kind === "anon") { add(3, "chapter-3-event-badges", "chapter-3-event-badges (1)"); add(3, "chapter-3-event-badges", "chapter-3-event-badges (2)"); }
-  else { add(3, "chapter-3-personal-badges", "chapter-3-personal-badges"); add(3, "chapter-3-event-badges", "chapter-3-event-badges"); }
+  else add(3, "chapter-3-personal-badges", "chapter-3-personal-badges");
   add(3, "chapter-4", "chapter-4", { topGame: top, reveal: false });
   add(3, "chapter-4-top-game", "chapter-4-top-game", { icon: top, reveal: true });
   add(3, "chapter-4-editor-video", "chapter-4-editor-video", { reveal: true });
