@@ -34,12 +34,47 @@ body { font: 500 14px/1.4 "NYT Franklin", "Helvetica Neue", Arial, sans-serif; }
 .blk-icon { top: var(--yig-copy-top); }
 .blk-copy { top: var(--yig-copy-top); }
 
-.blk-copy.after-icon-slot { top: calc(var(--yig-copy-top) + 71px); }
+.blk { row-gap: 16px; }
+.blk-copy.after-icon-slot { top: calc(var(--yig-copy-top) + 74px); }
+.blk-copy.after-icon-comm { top: calc(var(--yig-copy-top) + 66px); }
 .t-serif { font: 500 24px / 1.2 "NYT Karnak", Georgia, serif; }
-.t-big { font: 700 25px / 1.3 "NYT Karnak", Georgia, serif; margin-top: 10px; }
-.t-small { font: 500 14px / 1.42 "NYT Franklin", Arial, sans-serif; margin-top: 8px; }
-.t-tag { font: 700 11px / 1.2 "NYT Franklin", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #5C6759; margin-bottom: 10px; }
+.t-serif.lg { font-size: 26px; }
+.t-big { font: 600 28px / normal "NYT Karnak", Georgia, serif; }
+.t-small { font: 500 18px / 1.2 "NYT Franklin", Arial, sans-serif; }
+.t-multi { display: grid; justify-items: center; }
+.g24 { margin-top: 8px; }
+.g56 { margin-top: 40px; }
+.w206 { max-width: 206px; } .w227 { max-width: 227px; } .w311 { max-width: 311px; } .w335 { max-width: 335px; }
 .t-icon img { width: 50px; height: auto; display: block; }
+
+.gicon img { width: 50px; height: auto; display: block; margin-bottom: -4px; }
+.gicon-first img { width: 91px; height: auto; display: block; }
+.wgrid { display: grid; row-gap: 10px; }
+.wrow { display: flex; gap: 4px; justify-content: center; }
+.wrow i { display: grid; place-items: center; width: 48px; height: 50px; font: 700 28px / 1 "NYT Franklin", Arial, sans-serif; font-style: normal; color: #FFF; }
+.wrow i.g { background: #6AAA64; } .wrow i.y { background: #C9B458; } .wrow i.n { background: #787C7E; }
+.ctiles { display: grid; row-gap: 10px; width: 155px; }
+.ctiles i { display: block; height: 40px; border-radius: 4px; }
+.hist, .hist.g24 { display: flex; align-items: flex-end; justify-content: space-between; width: 272px; height: 146px; }
+.hist i { display: block; width: 28px; background: #121212; border-radius: 2px 2px 0 0; }
+.honey { display: flex; gap: 6px; justify-content: center; align-items: center; width: 288px; height: 81px; }
+.honey i { display: block; width: 38px; height: 44px; background: #F7DA21; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); }
+.honey i:nth-child(4) { background: #F8CD05; }
+.pangram { display: block; width: 23px; height: 24px; margin-bottom: -12px; background: #F7DA21; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); }
+.rank { display: block; margin-bottom: -12px; padding: 3px 8px; border: 1.5px solid #121212; border-radius: 4px; font: 700 11px / 1.2 "NYT Franklin", Arial, sans-serif; letter-spacing: .06em; }
+.badges { display: grid; grid-template-columns: repeat(3, 94px); gap: 16px 16px; width: 314px; margin-top: 16px; justify-content: center; }
+.badges i { display: block; width: 94px; height: 94px; border-radius: 50%; background: #E1DBF5; border: 1.5px solid #121212; }
+.blk-badges { left: 0; right: 0; }
+.pill { display: block; padding: 5px 10px; border: 1.5px solid #121212; border-radius: 4px; background: #FFF; font: 600 24px / 1.3 "NYT Karnak", Georgia, serif; }
+.blk-video { left: 48px; right: 48px; row-gap: 0; justify-items: start; text-align: left; }
+.blk-video .panel-video { width: 279px; height: 497px; margin: 0 0 21px; }
+.blk-video .pill + .pill { margin-top: -1.5px; }
+.login { display: block; font: 500 16px / 1.2 "NYT Franklin", Arial, sans-serif; margin-top: 4px; }
+.login u { text-decoration: underline; }
+body.anon-start .splash-support { top: 531px; }
+.blk-end { top: 202px; } .blk-end-anon { top: 249px; }
+.blk-end-anon, .blk-end { row-gap: 24px; }
+.btn.wide { width: 241px; margin-top: 8px; }
 .btn { display: inline-grid; place-items: center; margin-top: 18px; width: 196px; height: 48px; border-radius: 999px; background: #000; color: #FFF;
   font: 600 16px / 1 "NYT Franklin", Arial, sans-serif; }
 
@@ -172,59 +207,114 @@ if (FLOW === "sub" && own.length === 0) FLOW = "anon";
 const TOP = FLOW === "anon" ? "wordle" : (q.get("top") || own[0] || "wordle");
 
 const c = (file, scene, chapter, copy, extra = {}) => ({ file, scene, chapter, copy, ...extra });
+const H = (t, x = "") => ["t-serif" + x, t], S = (t) => ["t-big", t], B = (t, x = "") => ["t-small" + x, t];
+const WG = (w) => ["wgrid", w], GI = (g, size = "") => ["gicon" + size, g];
+const GAME_CARDS = {
+  wordle: [
+    [H("On average, you solved|Wordle puzzles in"), S("X guesses"), B("The average across all solvers was|4.27 guesses. Well played!")],
+    [H("Your best solves took"), S("X guesses"), H("which you did"), S("X times"), B("Luck. Skill. What a thrill.")],
+    [H("The hardest word of the year was"), WG("PSHAW"), B("28% of players were stumped|on May 14, including you!")],
+    [H("And your top|starting words were"), WG("ADIEU,AROSE,RAISE"), B("Look at you, making the first move.", " g24")],
+  ],
+  connections: [
+    [H("In Connections, your most common solving order was"), ["ctiles", ""]],
+    [H("You got the purple category first"), S("X times"), B("We see you, overachiever.")],
+    [H("And of puzzles you attempted, you had a"), S("X% solve rate")],
+    [H("On average, you solved puzzles while making"), S("2.3 mistakes"), B("The average across all solvers was 1 mistake. Tricky things, those red herrings!", " w227")],
+    [H("You also solved"), S("X perfect puzzles"), H("without mistakes."), B("And they say perfection doesn’t exist.")],
+  ],
+  "spelling-bee": [
+    [H("In Spelling Bee, you found|a total of"), S("X words"), B("Honey, what an accomplishment.")],
+    [H("Your longest word was"), ["honey", ""], B("The longest words in any puzzle this year were CATALYTICALLY, INTELLIGENTLY and CONTAMINATION.", " w335")],
+    [H("You also found"), ["pangram", ""], S("X pangrams"), B("Hive fives, all around.")],
+    [H("And you reached Genius"), ["rank", "GENIUS"], S("X times"), H("and Queen Bee"), ["rank", "QUEEN BEE"], S("X times"), B("Sweet, sweet victory.")],
+  ],
+  mini: [
+    [H("For the Mini, you solved|a total of"), S("X puzzles"), B("Small grid, big win.")],
+    [H("Your fastest time was"), S("XX:XX"), B("That’s some speedy typing.")],
+    [H("Your average time was"), S("XX:XX")],
+    [H("And your longest streak was"), S("X puzzles"), B("A not-so-Mini milestone.")],
+  ],
+  midi: [
+    [H("When it came to the Midi,|you solved a total of"), S("X puzzles")],
+    [H("Your longest streak was"), S("X days"), B("Gold stars look good on you.")],
+    [H("And your fastest puzzle|of the year was"), S("“[Break a leg]”"), B("You sure know your way around|a theme. It took you X:XX.")],
+  ],
+  crossword: [
+    [H("For the Crossword, you solved|most often on"), S("Mondays"), B("Starting the week with a win."), ["hist g24", ""]],
+    [H("Your average time was"), S("X:XX"), ["hist", ""]],
+    [H("Your fastest time was"), S("X:XX"), B("A puzzle boss. Down and across."), ["hist", ""]],
+    [H("And your longest streak was"), S("X days"), B("Who’s off the grid? Not you!")],
+  ],
+  strands: [
+    [H("In Strands, you solved|a total of"), S("X puzzles")],
+    [H("You found the spangram first"), S("X times"), B("Way to see all sides of the story.", " g24")],
+    [H("You solved without hints"), S("X times"), B("A-maze-ing.", " g24")],
+    [H("And found a total of"), S("X non-theme words"), B("Here for every twist and turn.", " g24")],
+  ],
+};
+const SUBSCRIBE = B("Subscribe for full access to all of our games.", " w206 g56");
+const COMMUNITY = {
+  connections: (anon) => [H(anon ? "A picture-only Connections puzzle stumped" : "In Connections, a picture-only puzzle stumped"), S("41% of players"), B("February 7. What a day.")],
+  "spelling-bee": (anon) => [H("The August 26 Spelling Bee puzzle gave us"), S("930,168 Geniuses"), B("Hive fives, all around."), ...(anon ? [SUBSCRIBE] : [])],
+  mini: (anon) => [H("Half of players solved the Mini in under"), S("100 seconds"), B("Speedsters unite."), ...(anon ? [SUBSCRIBE] : [])],
+  strands: (anon) => [H(anon ? "And in Strands," : "In Strands,"), S("23.3 million players"), H("solved a puzzle without hints."), B("A-maze-ing.", " g24")],
+  wordle: () => [H("In Wordle, the most popular starting word was"), WG("ADIEU"), B("Oh là là!")],
+};
 function buildCards() {
   const anon = FLOW === "anon";
   const out = [
     c(1, "loading", "Loading", [["loader", ""]], { slot: "loader" }),
-    c(1, "start", "Start", [["btn", "Let’s go"]], { slot: "start" }),
+    c(1, "start", "Start", anon ? [["btn", "Let’s go"], ["login", ""]] : [["btn", "Let’s go"]], { slot: "start" }),
     c(1, "ad", "Ad 1", [], { ad: true }),
   ];
+  const BOT = [["bubble", "Did you know: Over 1.9 million players achieved 100-day Wordle streaks this year. That’s a lot, even for this clever bot!"]];
   const ch1 = anon
-    ? [[["t-serif", "In 2026, you brought your best game."]],
-       [["t-serif", "Together, you all completed X million puzzles."], ["t-small", "That’s some serious puzzle power."]],
-       [["t-serif", "The most popular Wordle starting word was ADIEU."], ["t-small", "Oh là là!"]],
-       [["t-serif", "And the word that stumped the most players was PSHAW."], ["t-small", "(n) An expression of disapproval or disbelief."]],
-       [["bubble", "Did you know: Over XXX players achieved 100-day Wordle streaks this year. That’s a lot, even for this clever bot!"]]]
-    : [[["t-serif", "This year, you turned downtime into playtime."]],
-       [["t-serif", "You played a total of X puzzles."], ["t-small", "Cheers, super solver."]],
-       [["t-serif", "Your first puzzle was [game icon + name], [date, time]."]],
-       [["t-serif", "And your longest streak was in [game] at X days."], ["t-small", "Keep the wins coming."]],
-       [["bubble", "Did you know: Over XXX players achieved 100-day Wordle streaks this year. That’s a lot, even for this clever bot!"]]];
+    ? [[H("In 2026, you brought|your best game.", " lg")],
+       [H("Together, you all completed"), S("10.54 billion puzzles"), B("That’s some serious puzzle power.")],
+       [H("The most popular Wordle|starting word was"), WG("ADIEU"), B("Oh là là!")],
+       [H("And the word that stumped|the most players was"), WG("PSHAW"), B("Plenty of streaks wavered on May 14, too.")],
+       BOT]
+    : [[H("This year, you turned|downtime into playtime.")],
+       [H("You played a total of"), S("X puzzles"), B("Cheers, super solver.")],
+       [H("Your first puzzle was"), GI("wordle", "-first"), B("January 4, 1:23 p.m.")],
+       [H("And your longest streak was|in Connections at"), GI("connections"), S("X days"), B("Keep the wins coming.")],
+       BOT];
   const CH1_SCENES = ["chapter-1", "chapter-1-2", "chapter-1-3", "chapter-1-4", "chapter-1-5"];
   ch1.forEach((copy, i) => out.push(c(1, CH1_SCENES[i], i ? "" : "Chapter 1", copy, i === 4 ? { slot: "bubble" } : {})));
   out.push(c(1, "ad", "Ad 2", [], { ad: true }));
-  out.push(c(2, "chapter-2", "Chapter 2", [["t-serif", "But that’s not all"], ["t-small", "SAMPLE · the Chapter 2 opener"]]));
-  const community = (g, why) => c(2, g, "", [["t-tag", why], ["t-serif", `In ${NAME[g]}, all players…`], ["t-big", "Community stat"]], { community: true, icon: g });
+  out.push(c(2, "chapter-2", "Chapter 2", anon ? [H("But that’s not all.", " lg")] : [H("Let’s take a closer look|at your puzzle powers.")]));
+  const community = (g) => c(2, g, "", COMMUNITY[g](anon), { community: true, icon: g });
   if (anon) {
-    ANON_COMMUNITY.forEach((g) => out.push(community(g, "Community card · no lockup")));
+    ANON_COMMUNITY.forEach((g) => out.push(community(g)));
     out.push(c(2, "to-chapter-3", "Ad 3", [], { ad: true }));
   } else {
     for (const g of own) {
-      for (let i = 1; i <= CARDS_PER_GAME[g]; i++) {
-        out.push(c(2, g, "", [["t-tag", `${NAME[g]} · card ${i} of ${CARDS_PER_GAME[g]}`], ["t-serif", "Your stat"], ["t-big", "Sample"]], { icon: g }));
-      }
+      for (let i = 1; i <= CARDS_PER_GAME[g]; i++) out.push(c(2, g, "", GAME_CARDS[g][i - 1], { icon: g }));
     }
     if (own.length === 1) {
-      out.push(c(2, "chapter-2-community-intro", "Chapter 2.5", [["t-serif", "The rest of the world"], ["t-serif", "also came to play."]]));
-      COMMUNITY_ORDER.filter((g) => g !== own[0]).forEach((g) => out.push(community(g, "Chapter 2.5 · community card")));
+      out.push(c(2, "chapter-2-community-intro", "Chapter 2.5", [H("The rest of the world also came to play.")]));
+      COMMUNITY_ORDER.filter((g) => g !== own[0]).forEach((g) => out.push(community(g)));
     }
   }
   if (anon) {
-    out.push(c(3, "chapter-3", "Chapter 3", [["t-serif", "There’s plenty more to celebrate, too."]]));
-    out.push(c(3, "chapter-3-2", "", [["t-serif", "Crossplay, the Midi and bonus puzzles introduced new ways to play."], ["btn", "Download Crossplay app"], ["icons", "connections,crossword,midi"]]));
-    out.push(c(3, "chapter-3-event-badges", "", [["t-serif", "Connections hit 1000 puzzles."], ["panel", "1000TH BADGE · HTML · SAMPLE"]]));
-    out.push(c(3, "chapter-3-event-badges", "", [["t-serif", "And Wordle turned 5 and fabulous."], ["panel", "WORDLE 5 ICON · HTML · SAMPLE"]]));
+    out.push(c(3, "chapter-3", "Chapter 3", [H("There’s plenty more to celebrate, too.")]));
+    out.push(c(3, "chapter-3-2", "", [["icons", "connections,crossword,midi"], H("Crossplay, the Midi and bonus puzzles introduced new ways to play."), ["btn", "Download Crossplay app"]]));
+    out.push(c(3, "chapter-3-event-badges", "", [H("Connections hit 1000 puzzles."), ["panel", "1000TH BADGE · HTML · SAMPLE"]]));
+    out.push(c(3, "chapter-3-event-badges", "", [H("And Wordle turned 5 and fabulous."), ["panel", "WORDLE 5 ICON · HTML · SAMPLE"]]));
   } else {
-    out.push(c(3, "chapter-3", "Chapter 3", [["t-serif", "There’s plenty more to celebrate, too."]]));
-    out.push(c(3, "chapter-3-2", "", [["t-serif", "Crossplay, the Midi and bonus puzzles gave you new ways to play."]]));
-    if (PLAYER.achievements > 0) out.push(c(3, "chapter-3-personal-badges", "", [["t-serif", "You also earned new badges"], ["panel", `${PLAYER.achievements} PERSONAL BADGES · HTML · SAMPLE`]]));
+    out.push(c(3, "chapter-3", "Chapter 3", [H("There’s plenty more to celebrate, too.")]));
+    out.push(c(3, "chapter-3-2", "", [["icons", "connections,crossword,midi"], H("Crossplay, the Midi and bonus puzzles gave you new ways to play.")]));
+    if (PLAYER.achievements > 0) out.push(c(3, "chapter-3-personal-badges", "", [H("You also earned new badges.|And bragging rights."), ["badges", ""]], { slot: "badges" }));
   }
-  out.push(c(3, "chapter-4", "Chapter 4", [["t-serif", anon ? "But through it all, it’s clear everyone plays favorites." : "But through it all, it’s clear you play favorites."]], { topGame: TOP, reveal: false }));
-  out.push(c(3, "chapter-4-top-game", "", [["t-serif", anon ? "In 2026, everyone’s top game was…" : "In 2026, your top game was…"], ["t-big", NAME[TOP]]], { icon: TOP, reveal: true }));
-  out.push(c(3, "chapter-4-editor-video", "Video", [["panel panel-video", anon ? "VIDEO FROM ALL THE EDITORS · SAMPLE" : `${NAME[TOP].toUpperCase()} VIDEO · SAMPLE`], ["t-serif", "Tracey Bennett"], ["t-small", `Editor of ${NAME[TOP]} · SAMPLE`]], { kind: "video", reveal: true, bg: WALL[TOP] }));
+  out.push(c(3, "chapter-4", "Chapter 4", [anon ? H("But in the end, it’s clear|you all play favorites.") : H("But through it all, it’s clear|you play favorites.")], { topGame: TOP, reveal: false }));
+  out.push(c(3, "chapter-4-top-game", "", [H(anon ? "The top game of 2026 was..." : "In 2026, your top game was..."), S(NAME[TOP])], { icon: TOP, reveal: true }));
+  out.push(c(3, "chapter-4-editor-video", "Video", anon
+    ? [["panel panel-video", "VIDEO FROM ALL THE EDITORS · SAMPLE"]]
+    : [["panel panel-video", `${NAME[TOP].toUpperCase()} VIDEO · SAMPLE`], ["pill", "Tracy Bennett"], ["pill", `Editor of ${NAME[TOP]}`]], { kind: "video", reveal: true, bg: WALL[TOP], slot: "video" }));
   out.push(c(3, "end", "End", anon
-    ? [["t-serif", "Thanks for playing"], ["t-small", "Register for a personalized Year in Games next year. SAMPLE"]]
-    : [["t-serif", "Thanks for playing"], ["t-small", "SAMPLE"]]));
+    ? [H("Thanks for playing with us."), ["btn wide", "Subscribe for 75% off"], B("Want to see your own stats next year? Create a free account.", " w311 g24")]
+    : [H("Thanks for playing with us."), H("Which new games will|you try in 2027?", " g24"), ["btn wide", "View your stats"]], { slot: anon ? "end-anon" : "end" }));
   if (!anon) out.push(c(3, "share", "Share", [["panel", "SHARE CARD (HTML) · SAMPLE"]]));
   return out;
 }
@@ -238,17 +328,33 @@ function lineHtml([cls, text]) {
     return `<span class="yig-pop bubble"><b>${esc(lead)}:</b>${esc(rest.join(":"))}<svg width="26" height="22" viewBox="0 0 26 22" aria-hidden="true">`
       + `<path d="M0 0 L22 22 L18 0" fill="#FFF" stroke="#1F1F1F" stroke-width="2" stroke-linejoin="round"/><path d="M1.5 1 H17" stroke="#FFF" stroke-width="2.6"/></svg></span>`;
   }
-  if (cls === "btn") return `<span class="yig-pop btn">${esc(text)}</span>`;
+  if (cls.startsWith("btn")) return `<span class="yig-pop ${esc(cls)}">${esc(text)}</span>`;
+  if (cls === "login") return `<span class="yig-pop login">Already a subscriber? <u>Log In</u></span>`;
   if (cls === "icons") return `<span class="yig-pop icons">${text.split(",").map((g) => `<img src="icons/${ICON[g]}-icon.svg" alt="">`).join("")}</span>`;
   if (cls === "loader") return `<span class="yig-pop loader"><span id="loader-fill"></span></span>`;
-  return `<span class="yig-mask"><span class="yig-line ${esc(cls)}">${esc(text)}</span></span>`;
+  if (cls === "wgrid") {
+    const tone = ["g", "y", "n", "g", "g"];
+    return `<span class="yig-pop wgrid">${text.split(",").map((w) => `<span class="wrow">${[...w].map((ch, i) => `<i class="${tone[i % 5]}">${esc(ch)}</i>`).join("")}</span>`).join("")}</span>`;
+  }
+  if (cls === "ctiles") return `<span class="yig-pop ctiles"><i style="background:#F9DF6D"></i><i style="background:#A0C35A"></i><i style="background:#B0C4EF"></i><i style="background:#BA81C5"></i></span>`;
+  if (cls.startsWith("hist")) return `<span class="yig-pop ${esc(cls)}">${[40, 62, 90, 124, 100, 70, 46].map((h) => `<i style="height:${h}px"></i>`).join("")}</span>`;
+  if (cls === "honey") return `<span class="yig-pop honey">${"<i></i>".repeat(7)}</span>`;
+  if (cls === "pangram") return `<span class="yig-pop pangram"></span>`;
+  if (cls === "rank") return `<span class="yig-pop rank">${esc(text)}</span>`;
+  if (cls === "badges") return `<span class="yig-pop badges">${"<i></i>".repeat(12)}</span>`;
+  if (cls === "pill") return `<span class="yig-pop pill">${esc(text)}</span>`;
+  if (cls.startsWith("gicon")) return `<span class="yig-pop ${esc(cls)}"><img src="icons/${ICON[text]}-icon.svg" alt=""></span>`;
+  const parts = cls.split(" "), outer = parts.filter((m) => /^[gw]\d+$/.test(m)).join(" "), inner = parts.filter((m) => !/^[gw]\d+$/.test(m)).join(" ");
+  const lines = text.split("|");
+  const one = (t, o) => `<span class="yig-mask ${o}"><span class="yig-line ${esc(inner)}">${esc(t)}</span></span>`;
+  return lines.length > 1 ? `<span class="t-multi ${outer}">${lines.map((t) => one(t, "")).join("")}</span>` : one(text, outer);
 }
 let html = "";
 for (const g of new Set(cards.map((k) => k.icon).filter(Boolean))) {
   html += `<div class="yig-icon blk blk-icon" data-icon-game="${esc(g)}" hidden><span class="yig-pop t-icon"><img src="icons/${ICON[g]}-icon.svg" alt=""></span></div>`;
 }
 cards.forEach((k, i) => {
-  html += `<div class="yig-text blk blk-copy${k.icon ? " after-icon-slot" : ""}${k.slot ? ` blk-${k.slot}` : ""}" data-copy-frame="${i}" hidden>${k.copy.map(lineHtml).join("")}</div>`;
+  html += `<div class="yig-text blk blk-copy${k.icon ? (k.community ? " after-icon-comm" : " after-icon-slot") : ""}${k.slot ? ` blk-${k.slot}` : ""}" data-copy-frame="${i}" hidden>${k.copy.map(lineHtml).join("")}</div>`;
 });
 document.getElementById("overlay").insertAdjacentHTML("beforeend", html);
 
@@ -365,6 +471,7 @@ const videoBg = document.getElementById("video-bg");
 setInterval(() => {
   document.body.classList.toggle("on-splash", state().frame <= 1);
   progress.style.width = `${(100 * state().frame) / (cards.length - 1)}%`;
+  document.body.classList.toggle("anon-start", FLOW === "anon" && state().frame === 1);
   const k = cards[state().frame];
   if (k.bg) videoBg.style.background = k.bg;
   videoBg.style.opacity = k.kind === "video" ? 1 : 0;
